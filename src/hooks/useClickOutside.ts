@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react'
+import { useEffect } from 'react'
 
 /**
  * Calls `callback` when a click occurs outside of `ref`.
