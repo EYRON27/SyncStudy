@@ -6,6 +6,7 @@ import DashboardPage from '@/pages/DashboardPage'
 import TasksPage from '@/pages/TasksPage'
 import StudyRoomsPage from '@/pages/StudyRoomsPage'
 import ExpensesPage from '@/pages/ExpensesPage'
+import NotesPage from '@/pages/NotesPage'
 import ProtectedRoute from '@/router/ProtectedRoute'
 
 function App() {
@@ -22,6 +23,7 @@ function App() {
         <Route path="/tasks" element={<TasksPage />} />
         <Route path="/study-rooms" element={<StudyRoomsPage />} />
         <Route path="/expenses" element={<ExpensesPage />} />
+        <Route path="/notes" element={<NotesPage />} />
       </Route>
 
       {/* Fallback */}
