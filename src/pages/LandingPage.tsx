@@ -368,9 +368,51 @@ export default function LandingPage() {
             <h2 className="text-4xl md:text-5xl font-black tracking-[-0.02em] text-white mb-6">
               Ready to study smarter?
             </h2>
+            <p className="text-gray-400 text-[17px] mb-10">
+              Join 50,000+ students who use SyncStudy every day.
+            </p>
+            <div className="flex flex-col sm:flex-row items-center gap-4">
+              <Link
+                to="/register"
+                className="w-full sm:w-auto px-8 py-3.5 rounded-full bg-gradient-to-r from-[#ff8c37] to-[#e65c00] text-white font-semibold flex items-center justify-center gap-2 hover:opacity-90 transition-opacity shadow-[0_8px_20px_rgba(255,140,55,0.25)]"
+              >
+                Start for Free
+                <ArrowRight className="w-4 h-4" />
+              </Link>
+              <Link
+                to="/login"
+                className="w-full sm:w-auto px-8 py-3.5 rounded-full bg-[#16171b] border border-gray-800 text-white font-medium hover:bg-[#1f2025] transition-colors"
+              >
+                Sign In
+              </Link>
+            </div>
           </div>
         </motion.div>
       </section>
+
+      {/* Footer */}
+      <footer className="border-t border-gray-800/50 bg-[#0a0a0c] pt-10 pb-8 relative z-10">
+        <div className="container mx-auto px-6">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+            <div className="flex items-center gap-2">
+              <div className="w-6 h-6 rounded-md bg-gradient-to-br from-[#ff8c37] to-[#e65c00] flex items-center justify-center font-bold text-white text-xs">
+                S
+              </div>
+              <span className="text-sm font-bold tracking-tight text-white">SyncStudy</span>
+            </div>
+            
+            <p className="text-gray-600 text-[12px] font-medium">
+              © 2025 SyncStudy. Built for students everywhere.
+            </p>
+
+            <div className="flex items-center gap-6 text-[12px] text-gray-500 font-medium">
+              <Link to="/privacy" className="hover:text-white transition-colors">Privacy</Link>
+              <Link to="/terms" className="hover:text-white transition-colors">Terms</Link>
+              <Link to="/contact" className="hover:text-white transition-colors">Contact</Link>
+            </div>
+          </div>
+        </div>
+      </footer>
     </div>
   )
 }
