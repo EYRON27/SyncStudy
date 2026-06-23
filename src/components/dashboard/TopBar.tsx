@@ -1,9 +1,11 @@
 import { useState } from 'react'
 import { Search, Sparkles, Sun, Moon, Bell } from 'lucide-react'
 import AskAIModal from './AskAIModal'
+import NotificationsModal from './NotificationsModal'
 
 export default function TopBar() {
   const [isAIModalOpen, setIsAIModalOpen] = useState(false)
+  const [isNotifModalOpen, setIsNotifModalOpen] = useState(false)
   const [isLightMode, setIsLightMode] = useState(false)
 
   return (
@@ -39,13 +41,17 @@ export default function TopBar() {
         >
           {isLightMode ? <Moon className="w-5 h-5" /> : <Sun className="w-5 h-5" />}
         </button>
-        <button className="p-2 rounded-full text-gray-400 hover:text-white hover:bg-[#1a1c23] transition-colors relative">
+        <button 
+          onClick={() => setIsNotifModalOpen(true)}
+          className="p-2 rounded-full text-gray-400 hover:text-white hover:bg-[#1a1c23] transition-colors relative"
+        >
           <Bell className="w-5 h-5" />
           <span className="absolute top-2 right-2 w-2 h-2 bg-[#ff8c37] rounded-full border-2 border-[#0f1015]"></span>
         </button>
       </div>
 
       <AskAIModal isOpen={isAIModalOpen} onClose={() => setIsAIModalOpen(false)} />
+      <NotificationsModal isOpen={isNotifModalOpen} onClose={() => setIsNotifModalOpen(false)} />
     </div>
   )
 }
