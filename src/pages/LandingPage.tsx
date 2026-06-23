@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { Zap, ArrowRight, Shield, Globe, Sparkles, ChevronDown } from 'lucide-react'
+import { Zap, ArrowRight, Shield, Globe, Sparkles, ChevronDown, Star, BookOpen } from 'lucide-react'
 
 export default function LandingPage() {
   return (
@@ -248,6 +248,128 @@ export default function LandingPage() {
             </div>
           </motion.div>
         </div>
+      </section>
+
+      {/* Testimonials Section */}
+      <section id="testimonials" className="container mx-auto px-6 py-24 relative z-10">
+        <div className="flex flex-col items-center text-center mb-16">
+          <div className="text-[#ff8c37] text-xs font-bold tracking-[0.15em] uppercase mb-4">
+            TESTIMONIALS
+          </div>
+          <h2 className="text-4xl md:text-5xl font-black tracking-[-0.02em] text-white">
+            Students love it.
+          </h2>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-6xl mx-auto">
+          {/* Testimonial 1 */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5 }}
+            className="bg-[#121317] border border-gray-800/80 p-8 rounded-[20px] flex flex-col justify-between hover:border-gray-700 transition-colors"
+          >
+            <div>
+              <div className="flex items-center gap-1 mb-6">
+                {[...Array(5)].map((_, i) => (
+                  <Star key={i} className="w-4 h-4 fill-[#ff8c37] text-[#ff8c37]" />
+                ))}
+              </div>
+              <p className="text-gray-400 italic text-[15px] leading-relaxed mb-8">
+                "SyncStudy completely changed how I organize my semester. The AI assistant alone saves me hours every week."
+              </p>
+            </div>
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-full bg-[#1a1b20] flex items-center justify-center text-gray-400 text-sm font-semibold border border-gray-800">
+                SC
+              </div>
+              <div className="flex flex-col">
+                <span className="text-white font-bold text-[14px]">Sarah Chen</span>
+                <span className="text-gray-500 text-[12px]">CS Junior, MIT</span>
+              </div>
+            </div>
+          </motion.div>
+
+          {/* Testimonial 2 */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5, delay: 0.1 }}
+            className="bg-[#121317] border border-gray-800/80 p-8 rounded-[20px] flex flex-col justify-between hover:border-gray-700 transition-colors"
+          >
+            <div>
+              <div className="flex items-center gap-1 mb-6">
+                {[...Array(5)].map((_, i) => (
+                  <Star key={i} className="w-4 h-4 fill-[#ff8c37] text-[#ff8c37]" />
+                ))}
+              </div>
+              <p className="text-gray-400 italic text-[15px] leading-relaxed mb-8">
+                "The study rooms feature is incredible for group sessions. It feels like a real library, but online."
+              </p>
+            </div>
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-full bg-[#1a1b20] flex items-center justify-center text-gray-400 text-sm font-semibold border border-gray-800">
+                MW
+              </div>
+              <div className="flex flex-col">
+                <span className="text-white font-bold text-[14px]">Marcus Williams</span>
+                <span className="text-gray-500 text-[12px]">Pre-Med, Johns Hopkins</span>
+              </div>
+            </div>
+          </motion.div>
+
+          {/* Testimonial 3 */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5, delay: 0.2 }}
+            className="bg-[#121317] border border-gray-800/80 p-8 rounded-[20px] flex flex-col justify-between hover:border-gray-700 transition-colors"
+          >
+            <div>
+              <div className="flex items-center gap-1 mb-6">
+                {[...Array(5)].map((_, i) => (
+                  <Star key={i} className="w-4 h-4 fill-[#ff8c37] text-[#ff8c37]" />
+                ))}
+              </div>
+              <p className="text-gray-400 italic text-[15px] leading-relaxed mb-8">
+                "Finally an app that gets student life. Budget tracking + notes + tasks in one place is a game changer."
+              </p>
+            </div>
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-full bg-[#1a1b20] flex items-center justify-center text-gray-400 text-sm font-semibold border border-gray-800">
+                AT
+              </div>
+              <div className="flex flex-col">
+                <span className="text-white font-bold text-[14px]">Amelia Torres</span>
+                <span className="text-gray-500 text-[12px]">Engineering, Stanford</span>
+              </div>
+            </div>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* CTA Section Start */}
+      <section className="container mx-auto px-6 py-24 relative z-10 pb-40">
+        <motion.div 
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.7 }}
+          className="w-full max-w-[1000px] mx-auto bg-[#121317] border border-gray-800/80 rounded-[30px] p-12 md:p-20 text-center relative overflow-hidden ring-1 ring-white/5"
+        >
+          {/* Subtle gradient at the top */}
+          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[300px] bg-gradient-to-b from-[#ff8c37]/15 to-transparent rounded-full pointer-events-none blur-[80px]" />
+          
+          <div className="relative z-10 flex flex-col items-center">
+            <BookOpen className="w-10 h-10 text-[#ff8c37] mb-6" />
+            <h2 className="text-4xl md:text-5xl font-black tracking-[-0.02em] text-white mb-6">
+              Ready to study smarter?
+            </h2>
+          </div>
+        </motion.div>
       </section>
     </div>
   )
