@@ -1,7 +1,17 @@
-import { Link } from 'react-router-dom'
+import { Link, useLocation } from 'react-router-dom'
 import { LayoutDashboard, CheckSquare, Users, DollarSign, FileText, Settings, LogOut } from 'lucide-react'
 
 export default function Sidebar() {
+  const location = useLocation()
+  const isActive = (path: string) => location.pathname === path
+
+  const navItemClass = (path: string) => {
+    if (isActive(path)) {
+      return "relative flex items-center gap-3 px-3 py-2.5 rounded-xl bg-gradient-to-r from-[#ff8c37]/15 to-transparent text-[#ff8c37] font-semibold before:absolute before:left-0 before:top-[15%] before:bottom-[15%] before:w-[3px] before:bg-[#ff8c37] before:rounded-r-full"
+    }
+    return "relative flex items-center gap-3 px-3 py-2.5 rounded-xl text-gray-400 hover:text-white hover:bg-[#13141a] transition-colors font-medium"
+  }
+
   return (
     <div className="w-[260px] flex-shrink-0 bg-[#0a0a0c] border-r border-gray-800/50 flex flex-col h-screen overflow-y-auto relative z-20">
       {/* Logo */}
@@ -16,23 +26,23 @@ export default function Sidebar() {
 
       {/* Nav Links */}
       <div className="flex-1 px-4 py-2 space-y-1.5">
-        <Link to="/dashboard" className="flex items-center gap-3 px-3 py-2.5 rounded-xl bg-gradient-to-r from-[#ff8c37]/10 to-transparent text-[#ff8c37] font-medium border border-[#ff8c37]/20">
+        <Link to="/dashboard" className={navItemClass('/dashboard')}>
           <LayoutDashboard className="w-5 h-5" />
           Dashboard
         </Link>
-        <Link to="/tasks" className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-gray-400 hover:text-white hover:bg-[#13141a] transition-colors font-medium">
+        <Link to="/tasks" className={navItemClass('/tasks')}>
           <CheckSquare className="w-5 h-5" />
           Tasks
         </Link>
-        <Link to="/study-rooms" className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-gray-400 hover:text-white hover:bg-[#13141a] transition-colors font-medium">
+        <Link to="/study-rooms" className={navItemClass('/study-rooms')}>
           <Users className="w-5 h-5" />
           Study Rooms
         </Link>
-        <Link to="/expenses" className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-gray-400 hover:text-white hover:bg-[#13141a] transition-colors font-medium">
+        <Link to="/expenses" className={navItemClass('/expenses')}>
           <DollarSign className="w-5 h-5" />
           Expenses
         </Link>
-        <Link to="/notes" className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-gray-400 hover:text-white hover:bg-[#13141a] transition-colors font-medium">
+        <Link to="/notes" className={navItemClass('/notes')}>
           <FileText className="w-5 h-5" />
           Notes
         </Link>
