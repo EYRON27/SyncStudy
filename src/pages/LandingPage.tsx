@@ -164,9 +164,9 @@ export default function LandingPage() {
             <div className="text-[#ff8c37] text-xs font-bold tracking-[0.15em] uppercase mb-6">
               ABOUT SYNCSTUDY
             </div>
-            
+
             <h2 className="text-4xl md:text-5xl font-black tracking-[-0.02em] mb-6 leading-[1.1]">
-              Built for students, <br/>
+              Built for students, <br />
               <span className="text-gray-500">by students.</span>
             </h2>
 
@@ -353,7 +353,7 @@ export default function LandingPage() {
 
       {/* CTA Section Start */}
       <section className="container mx-auto px-6 py-24 relative z-10 pb-40">
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
@@ -362,7 +362,7 @@ export default function LandingPage() {
         >
           {/* Subtle gradient at the top */}
           <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[300px] bg-gradient-to-b from-[#ff8c37]/15 to-transparent rounded-full pointer-events-none blur-[80px]" />
-          
+
           <div className="relative z-10 flex flex-col items-center">
             <BookOpen className="w-10 h-10 text-[#ff8c37] mb-6" />
             <h2 className="text-4xl md:text-5xl font-black tracking-[-0.02em] text-white mb-6">
@@ -400,7 +400,7 @@ export default function LandingPage() {
               </div>
               <span className="text-sm font-bold tracking-tight text-white">SyncStudy</span>
             </div>
-            
+
             <p className="text-gray-600 text-[12px] font-medium">
               © 2025 SyncStudy. Built for students everywhere.
             </p>
