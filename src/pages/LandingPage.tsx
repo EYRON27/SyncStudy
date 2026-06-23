@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { Zap, ArrowRight, Shield, Globe, Sparkles, ChevronDown, Star, BookOpen } from 'lucide-react'
+import { Zap, ArrowRight, Shield, Globe, Sparkles, ChevronDown, Star, BookOpen, CheckSquare, Users, Brain, DollarSign, FileText, BarChart2 } from 'lucide-react'
 
 export default function LandingPage() {
   return (
@@ -248,6 +248,159 @@ export default function LandingPage() {
             </div>
           </motion.div>
         </div>
+      </section>
+
+      {/* Services Section */}
+      <section id="services" className="container mx-auto px-6 py-24 relative z-10">
+        <div className="flex flex-col items-center text-center mb-16">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="text-[#ff8c37] text-xs font-bold tracking-[0.15em] uppercase mb-4"
+          >
+            SERVICES
+          </motion.div>
+          <motion.h2
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.1 }}
+            className="text-4xl md:text-5xl font-black tracking-[-0.02em] text-white mb-4"
+          >
+            Everything you need, <br />
+            <span className="text-gray-500">nothing you don't.</span>
+          </motion.h2>
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.2 }}
+            className="text-gray-400 text-[17px] max-w-2xl"
+          >
+            Six powerful tools that work together seamlessly, so you can focus on learning — not managing apps.
+          </motion.p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-[1100px] mx-auto">
+          {/* Card 1 */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.1 }}
+            className="bg-[#121317] border border-gray-800/80 p-8 rounded-[20px] hover:border-gray-700 hover:bg-[#16171b] transition-all duration-300 group"
+          >
+            <div className="w-10 h-10 rounded-[10px] bg-[#1a1c23] flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
+              <CheckSquare className="w-5 h-5 text-blue-400" />
+            </div>
+            <h3 className="text-white font-bold text-[17px] mb-3">Smart Task Management</h3>
+            <p className="text-gray-500 text-[14px] leading-relaxed">
+              Kanban-style boards to organize assignments by course, priority, and deadline. Never miss a due date.
+            </p>
+          </motion.div>
+
+          {/* Card 2 */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.2 }}
+            className="bg-[#121317] border border-gray-800/80 p-8 rounded-[20px] hover:border-gray-700 hover:bg-[#16171b] transition-all duration-300 group"
+          >
+            <div className="w-10 h-10 rounded-[10px] bg-[#1a1512] flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
+              <Users className="w-5 h-5 text-[#ff8c37]" />
+            </div>
+            <h3 className="text-white font-bold text-[17px] mb-3">Live Study Rooms</h3>
+            <p className="text-gray-500 text-[14px] leading-relaxed">
+              Real-time collaborative spaces with video, chat, and screen sharing. Study together from anywhere.
+            </p>
+          </motion.div>
+
+          {/* Card 3 */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.3 }}
+            className="bg-[#121317] border border-gray-800/80 p-8 rounded-[20px] hover:border-gray-700 hover:bg-[#16171b] transition-all duration-300 group"
+          >
+            <div className="w-10 h-10 rounded-[10px] bg-[#1a1512] flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
+              <Brain className="w-5 h-5 text-[#ff8c37]" />
+            </div>
+            <h3 className="text-white font-bold text-[17px] mb-3">AI Study Assistant</h3>
+            <p className="text-gray-500 text-[14px] leading-relaxed">
+              Get instant explanations, summaries, flashcard generation, and personalized study plans powered by AI.
+            </p>
+          </motion.div>
+
+          {/* Card 4 */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.4 }}
+            className="bg-[#121317] border border-gray-800/80 p-8 rounded-[20px] hover:border-gray-700 hover:bg-[#16171b] transition-all duration-300 group"
+          >
+            <div className="w-10 h-10 rounded-[10px] bg-[#121a16] flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
+              <DollarSign className="w-5 h-5 text-emerald-400" />
+            </div>
+            <h3 className="text-white font-bold text-[17px] mb-3">Budget Tracker</h3>
+            <p className="text-gray-500 text-[14px] leading-relaxed">
+              Visual expense breakdowns with pie charts, category tags, and monthly budget alerts for student life.
+            </p>
+          </motion.div>
+
+          {/* Card 5 */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.5 }}
+            className="bg-[#121317] border border-gray-800/80 p-8 rounded-[20px] hover:border-gray-700 hover:bg-[#16171b] transition-all duration-300 group"
+          >
+            <div className="w-10 h-10 rounded-[10px] bg-[#1a131b] flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
+              <FileText className="w-5 h-5 text-purple-400" />
+            </div>
+            <h3 className="text-white font-bold text-[17px] mb-3">Notes & Knowledge Base</h3>
+            <p className="text-gray-500 text-[14px] leading-relaxed">
+              Rich-text notes organized by subject. AI summarization and smart search across your entire library.
+            </p>
+          </motion.div>
+
+          {/* Card 6 */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.6 }}
+            className="bg-[#121317] border border-gray-800/80 p-8 rounded-[20px] hover:border-gray-700 hover:bg-[#16171b] transition-all duration-300 group"
+          >
+            <div className="w-10 h-10 rounded-[10px] bg-[#131b20] flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
+              <BarChart2 className="w-5 h-5 text-cyan-400" />
+            </div>
+            <h3 className="text-white font-bold text-[17px] mb-3">Study Analytics</h3>
+            <p className="text-gray-500 text-[14px] leading-relaxed">
+              Weekly study hour reports, task completion trends, and AI interaction stats to optimize your habits.
+            </p>
+          </motion.div>
+        </div>
+
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ delay: 0.7 }}
+          className="mt-16 flex justify-center"
+        >
+          <Link
+            to="/register"
+            className="px-8 py-3.5 rounded-full bg-gradient-to-r from-[#ff8c37] to-[#e65c00] text-white font-semibold flex items-center justify-center gap-2 hover:opacity-90 transition-opacity shadow-[0_8px_20px_rgba(255,140,55,0.25)]"
+          >
+            Explore All Features
+            <ArrowRight className="w-4 h-4" />
+          </Link>
+        </motion.div>
       </section>
 
       {/* Testimonials Section */}
