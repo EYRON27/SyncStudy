@@ -1,9 +1,19 @@
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { X, Mail, Key } from 'lucide-react'
 import LandingPage from './LandingPage'
+import { useAuthStore } from '@/store/authStore'
 
 export default function LoginPage() {
+  const navigate = useNavigate()
+  const login = useAuthStore((state) => state.login)
+
+  const handleBypassLogin = (e?: React.FormEvent | React.MouseEvent) => {
+    e?.preventDefault()
+    login({ id: '1', name: 'Alex Dev', email: 'alex@example.com' }, 'fake-jwt-token')
+    navigate('/dashboard')
+  }
+
   return (
     <div className="relative min-h-screen bg-[#0f1015] font-sans">
       {/* Background Page - locked from scrolling */}
@@ -43,7 +53,7 @@ export default function LoginPage() {
           </div>
 
           {/* Form */}
-          <form className="flex flex-col gap-4">
+          <form onSubmit={handleBypassLogin} className="flex flex-col gap-4">
             <div>
               <label className="block text-[13px] font-semibold text-gray-300 mb-1.5 ml-1">Email</label>
               <div className="relative">
@@ -74,7 +84,7 @@ export default function LoginPage() {
             </div>
 
             <button
-              type="button"
+              type="submit"
               className="w-full mt-3 py-3.5 rounded-full bg-gradient-to-r from-[#ff8c37] to-[#e65c00] text-white text-[15px] font-bold hover:opacity-90 transition-opacity shadow-[0_4px_14px_rgba(255,140,55,0.3)]"
             >
               Sign In
@@ -91,6 +101,7 @@ export default function LoginPage() {
           {/* Social Login */}
           <button
             type="button"
+            onClick={handleBypassLogin}
             className="w-full flex items-center justify-center gap-3 py-3 rounded-full bg-[#13141a] border border-gray-800/80 text-[14px] text-gray-300 font-semibold hover:bg-gray-800/40 hover:text-white transition-all"
           >
             <svg viewBox="0 0 24 24" className="w-[18px] h-[18px]" fill="none" xmlns="http://www.w3.org/2000/svg">
