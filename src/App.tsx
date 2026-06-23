@@ -4,6 +4,8 @@ import LoginPage from '@/pages/LoginPage'
 import RegisterPage from '@/pages/RegisterPage'
 import DashboardPage from '@/pages/DashboardPage'
 import TasksPage from '@/pages/TasksPage'
+import StudyRoomsPage from '@/pages/StudyRoomsPage'
+import ExpensesPage from '@/pages/ExpensesPage'
 import ProtectedRoute from '@/router/ProtectedRoute'
 
 function App() {
@@ -18,6 +20,8 @@ function App() {
       <Route element={<ProtectedRoute />}>
         <Route path="/dashboard" element={<DashboardPage />} />
         <Route path="/tasks" element={<TasksPage />} />
+        <Route path="/study-rooms" element={<StudyRoomsPage />} />
+        <Route path="/expenses" element={<ExpensesPage />} />
       </Route>
 
       {/* Fallback */}
