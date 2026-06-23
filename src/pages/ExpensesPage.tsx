@@ -86,11 +86,16 @@ export default function ExpensesPage() {
                 {/* Donut Chart */}
                 <div className="relative w-56 h-56 mx-auto mb-10">
                   <svg viewBox="0 0 100 100" className="w-full h-full overflow-visible drop-shadow-md">
-                    <DonutSegment percent={0.48} offset={0} color="#4a6378" />
-                    <DonutSegment percent={0.16} offset={0.49} color="#ff8c37" />
-                    <DonutSegment percent={0.08} offset={0.66} color="#a35215" poppedOut={true} />
-                    <DonutSegment percent={0.12} offset={0.75} color="#e8d5c4" />
-                    <DonutSegment percent={0.11} offset={0.88} color="#3b415a" />
+                    {/* Blue (Housing) */}
+                    <DonutSegment percent={0.46} offset={0.01} color="#4a6378" />
+                    {/* Orange (Food) */}
+                    <DonutSegment percent={0.18} offset={0.49} color="#ff8c37" />
+                    {/* Brown (Transport) */}
+                    <DonutSegment percent={0.08} offset={0.69} color="#a35215" poppedOut={true} />
+                    {/* Supplies (Beige) */}
+                    <DonutSegment percent={0.12} offset={0.79} color="#e8d5c4" />
+                    {/* Entertainment (Dark Gray) */}
+                    <DonutSegment percent={0.09} offset={0.93} color="#3b415a" />
                   </svg>
                 </div>
 
