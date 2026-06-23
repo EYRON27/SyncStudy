@@ -1,6 +1,11 @@
-import { Search, Sparkles, Sun, Bell } from 'lucide-react'
+import { useState } from 'react'
+import { Search, Sparkles, Sun, Moon, Bell } from 'lucide-react'
+import AskAIModal from './AskAIModal'
 
 export default function TopBar() {
+  const [isAIModalOpen, setIsAIModalOpen] = useState(false)
+  const [isLightMode, setIsLightMode] = useState(false)
+
   return (
     <div className="h-[80px] flex items-center justify-between px-8 border-b border-gray-800/50 bg-[#0f1015] relative z-10">
       {/* Search */}
@@ -20,19 +25,27 @@ export default function TopBar() {
 
       {/* Right Actions */}
       <div className="flex items-center gap-4">
-        <button className="flex items-center gap-2 px-4 py-2 rounded-full border border-[#ff8c37]/30 bg-[#ff8c37]/10 text-[#ff8c37] hover:bg-[#ff8c37]/20 transition-colors text-sm font-semibold">
+        <button 
+          onClick={() => setIsAIModalOpen(true)}
+          className="flex items-center gap-2 px-4 py-2 rounded-full border border-[#ff8c37]/30 bg-[#ff8c37]/10 text-[#ff8c37] hover:bg-[#ff8c37]/20 transition-colors text-sm font-semibold"
+        >
           <Sparkles className="w-4 h-4" />
           Ask AI
         </button>
         <div className="w-px h-6 bg-gray-800 mx-1"></div>
-        <button className="p-2 rounded-full text-gray-400 hover:text-white hover:bg-[#1a1c23] transition-colors">
-          <Sun className="w-5 h-5" />
+        <button 
+          onClick={() => setIsLightMode(!isLightMode)}
+          className="p-2 rounded-full text-gray-400 hover:text-white hover:bg-[#1a1c23] transition-colors"
+        >
+          {isLightMode ? <Moon className="w-5 h-5" /> : <Sun className="w-5 h-5" />}
         </button>
         <button className="p-2 rounded-full text-gray-400 hover:text-white hover:bg-[#1a1c23] transition-colors relative">
           <Bell className="w-5 h-5" />
           <span className="absolute top-2 right-2 w-2 h-2 bg-[#ff8c37] rounded-full border-2 border-[#0f1015]"></span>
         </button>
       </div>
+
+      <AskAIModal isOpen={isAIModalOpen} onClose={() => setIsAIModalOpen(false)} />
     </div>
   )
 }
