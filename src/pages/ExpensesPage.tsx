@@ -2,6 +2,44 @@ import Sidebar from '@/components/dashboard/Sidebar'
 import TopBar from '@/components/dashboard/TopBar'
 import { Download, Plus, Filter, DollarSign } from 'lucide-react'
 
+// Helper to draw SVG donut segments with borders
+const DonutSegment = ({ percent, offset, color, poppedOut = false }: { percent: number, offset: number, color: string, poppedOut?: boolean }) => {
+  const rOuter = 42;
+  const rInner = 28;
+  const cx = 50;
+  const cy = 50;
+  
+  const startAngle = (offset * 2 * Math.PI) - Math.PI/2;
+  const endAngle = ((offset + percent) * 2 * Math.PI) - Math.PI/2;
+  
+  const startOuterX = cx + rOuter * Math.cos(startAngle);
+  const startOuterY = cy + rOuter * Math.sin(startAngle);
+  const endOuterX = cx + rOuter * Math.cos(endAngle);
+  const endOuterY = cy + rOuter * Math.sin(endAngle);
+  
+  const startInnerX = cx + rInner * Math.cos(startAngle);
+  const startInnerY = cy + rInner * Math.sin(startAngle);
+  const endInnerX = cx + rInner * Math.cos(endAngle);
+  const endInnerY = cy + rInner * Math.sin(endAngle);
+  
+  const largeArcFlag = percent > 0.5 ? 1 : 0;
+  
+  const d = `
+    M ${startOuterX} ${startOuterY}
+    A ${rOuter} ${rOuter} 0 ${largeArcFlag} 1 ${endOuterX} ${endOuterY}
+    L ${endInnerX} ${endInnerY}
+    A ${rInner} ${rInner} 0 ${largeArcFlag} 0 ${startInnerX} ${startInnerY}
+    Z
+  `;
+  
+  const midAngle = startAngle + (endAngle - startAngle)/2;
+  const popTransform = poppedOut ? `translate(${Math.cos(midAngle)*4}, ${Math.sin(midAngle)*4})` : '';
+
+  return (
+    <path d={d} fill={color} stroke="#e2e8f0" strokeWidth="0.8" transform={popTransform} strokeLinejoin="round" />
+  );
+}
+
 export default function ExpensesPage() {
   const transactions = [
     { id: 1, title: 'Textbooks', subtitle: 'Oct 24 • Supplies', amount: '$120.00', type: 'expense' },
@@ -43,60 +81,52 @@ export default function ExpensesPage() {
               
               {/* Left Column: Breakdown */}
               <div className="lg:col-span-1 bg-[#121317] border border-gray-800/80 rounded-[20px] p-6 flex flex-col">
-                <h2 className="text-white font-bold text-[15px] mb-12">Monthly Breakdown</h2>
+                <h2 className="text-white font-bold text-[16px] mb-10">Monthly Breakdown</h2>
                 
                 {/* Donut Chart */}
                 <div className="relative w-56 h-56 mx-auto mb-10">
-                  <svg viewBox="0 0 100 100" className="w-full h-full transform -rotate-90 overflow-visible drop-shadow-md">
-                    {/* Housing (Blue) ~48% */}
-                    <circle cx="50" cy="50" r="38" fill="transparent" stroke="#4a6378" strokeWidth="12" strokeDasharray="120 251.32" />
-                    {/* Food (Orange) ~16% */}
-                    <circle cx="50" cy="50" r="38" fill="transparent" stroke="#ff8c37" strokeWidth="12" strokeDasharray="40 251.32" transform="rotate(176.2 50 50)" />
-                    {/* Transport (Darker Orange) ~10% (Popped out) */}
-                    <circle cx="50" cy="50" r="38" fill="transparent" stroke="#a35215" strokeWidth="12" strokeDasharray="25 251.32" transform="rotate(237.8 50 50) translate(-3, -2)" />
-                    {/* Supplies (White) ~10% */}
-                    <circle cx="50" cy="50" r="38" fill="transparent" stroke="#e2e8f0" strokeWidth="12" strokeDasharray="25 251.32" transform="rotate(277.9 50 50)" />
-                    {/* Entertainment (Gray) ~12% */}
-                    <circle cx="50" cy="50" r="38" fill="transparent" stroke="#3b415a" strokeWidth="12" strokeDasharray="26.32 251.32" transform="rotate(318 50 50)" />
+                  <svg viewBox="0 0 100 100" className="w-full h-full overflow-visible drop-shadow-md">
+                    <DonutSegment percent={0.48} offset={0} color="#4a6378" />
+                    <DonutSegment percent={0.16} offset={0.49} color="#ff8c37" />
+                    <DonutSegment percent={0.08} offset={0.66} color="#a35215" poppedOut={true} />
+                    <DonutSegment percent={0.12} offset={0.75} color="#e8d5c4" />
+                    <DonutSegment percent={0.11} offset={0.88} color="#3b415a" />
                   </svg>
-                  
-                  {/* Tooltip */}
-                  <div className="absolute top-[50%] left-[85%] -translate-y-[40%] bg-[#1a1c23] border border-gray-700/80 text-gray-300 text-[11px] font-semibold px-3 py-1.5 rounded-lg whitespace-nowrap shadow-[0_4px_12px_rgba(0,0,0,0.5)] z-10 flex items-center gap-1.5">
-                    Transport : 100
-                  </div>
                 </div>
 
                 {/* Legend */}
-                <div className="flex flex-wrap justify-center gap-x-5 gap-y-3 mb-10 px-2">
-                  <div className="flex items-center gap-2 text-[11px] font-semibold text-gray-500 tracking-wide">
-                    <div className="w-2.5 h-2.5 rounded-full bg-[#4a6378]"></div> Housing
+                <div className="flex flex-col items-center gap-3 mb-12">
+                  <div className="flex flex-wrap justify-center gap-x-5 gap-y-3 px-2">
+                    <div className="flex items-center gap-2 text-[13px] text-gray-400">
+                      <div className="w-3 h-3 rounded-full bg-[#4a6378]"></div> Housing
+                    </div>
+                    <div className="flex items-center gap-2 text-[13px] text-[#ff8c37]">
+                      <div className="w-3 h-3 rounded-full bg-[#ff8c37]"></div> Food
+                    </div>
+                    <div className="flex items-center gap-2 text-[13px] text-[#a35215]">
+                      <div className="w-3 h-3 rounded-full bg-[#a35215]"></div> Transport
+                    </div>
+                    <div className="flex items-center gap-2 text-[13px] text-[#e8d5c4]">
+                      <div className="w-3 h-3 rounded-full bg-[#e8d5c4]"></div> Supplies
+                    </div>
                   </div>
-                  <div className="flex items-center gap-2 text-[11px] font-semibold text-gray-500 tracking-wide">
-                    <div className="w-2.5 h-2.5 rounded-full bg-[#ff8c37]"></div> Food
-                  </div>
-                  <div className="flex items-center gap-2 text-[11px] font-semibold text-gray-500 tracking-wide">
-                    <div className="w-2.5 h-2.5 rounded-full bg-[#a35215]"></div> Transport
-                  </div>
-                  <div className="flex items-center gap-2 text-[11px] font-semibold text-gray-500 tracking-wide">
-                    <div className="w-2.5 h-2.5 rounded-full bg-[#e2e8f0]"></div> Supplies
-                  </div>
-                  <div className="flex items-center gap-2 text-[11px] font-semibold text-gray-500 tracking-wide">
-                    <div className="w-2.5 h-2.5 rounded-full bg-[#3b415a]"></div> Entertainment
+                  <div className="flex items-center gap-2 text-[13px] text-[#3b415a]">
+                    <div className="w-3 h-3 rounded-full bg-[#3b415a]"></div> Entertainment
                   </div>
                 </div>
 
-                {/* Progress Bar */}
-                <div className="mt-auto border-t border-gray-800/50 pt-8 pb-2">
+                {/* Progress Bar Container */}
+                <div className="mt-auto border border-gray-800/60 rounded-[14px] p-5 bg-[#16171d]">
                   <div className="flex justify-between items-center mb-3">
-                    <span className="text-gray-500 text-[13px] font-semibold">Total Budget</span>
+                    <span className="text-gray-400 text-[12px] font-medium">Total Budget</span>
                     <span className="text-white text-[14px] font-bold">$1,500</span>
                   </div>
-                  <div className="flex justify-between items-center mb-4">
-                    <span className="text-gray-500 text-[13px] font-semibold">Spent</span>
+                  <div className="flex justify-between items-center mb-5">
+                    <span className="text-gray-400 text-[12px] font-medium">Spent</span>
                     <span className="text-[#ff8c37] text-[14px] font-bold">$1,430</span>
                   </div>
-                  <div className="w-full h-2 rounded-full bg-[#1a1c23] overflow-hidden border border-gray-800/80">
-                    <div className="h-full bg-gradient-to-r from-[#ff8c37] to-[#e65c00] rounded-full" style={{ width: '95%' }}></div>
+                  <div className="w-full h-2 rounded-full bg-[#20222b] overflow-hidden">
+                    <div className="h-full bg-[#ff8c37] rounded-full" style={{ width: '95%' }}></div>
                   </div>
                 </div>
               </div>
