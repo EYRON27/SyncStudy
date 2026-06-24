@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react'
 import Sidebar from '@/components/dashboard/Sidebar'
 import TopBar from '@/components/dashboard/TopBar'
-import { Plus, MoreHorizontal, MessageSquare, Paperclip, Loader2 } from 'lucide-react'
-import { tasksService, Task } from '@/features/tasks/api/tasks.service'
+import { Plus, MoreHorizontal, Loader2 } from 'lucide-react'
+import { tasksService } from '@/features/tasks/api/tasks.service'
+import type { Task } from '@/features/tasks/api/tasks.service'
 import AddTaskModal from '@/components/dashboard/AddTaskModal'
 
 export default function TasksPage() {

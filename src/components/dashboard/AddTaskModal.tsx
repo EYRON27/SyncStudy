@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { X, Loader2 } from 'lucide-react'
-import { tasksService, CreateTaskInput } from '@/features/tasks/api/tasks.service'
+import { tasksService } from '@/features/tasks/api/tasks.service'
 
 interface AddTaskModalProps {
   isOpen: boolean

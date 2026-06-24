@@ -1,6 +1,6 @@
 import Sidebar from '@/components/dashboard/Sidebar'
 import TopBar from '@/components/dashboard/TopBar'
-import { Plus, Search, Folder, MoreVertical, Star, Sparkles } from 'lucide-react'
+import { Plus, Search, Folder, MoreVertical, Star } from 'lucide-react'
 
 export default function NotesPage() {
   const folders = [
