@@ -1,8 +1,12 @@
+import { useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { LayoutDashboard, CheckSquare, Users, DollarSign, FileText, Settings, LogOut } from 'lucide-react'
+import SettingsModal from './SettingsModal'
 
 export default function Sidebar() {
   const location = useLocation()
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false)
+
   const isActive = (path: string) => location.pathname === path
 
   const navItemClass = (path: string) => {
@@ -60,7 +64,10 @@ export default function Sidebar() {
             </div>
           </div>
           <div className="space-y-1">
-            <button className="w-full flex items-center gap-3 px-2 py-2 rounded-lg text-gray-400 hover:text-white hover:bg-[#1a1c23] transition-colors text-sm font-medium">
+            <button
+              onClick={() => setIsSettingsOpen(true)}
+              className="w-full flex items-center gap-3 px-2 py-2 rounded-lg text-gray-400 hover:text-white hover:bg-[#1a1c23] transition-colors text-sm font-medium"
+            >
               <Settings className="w-4 h-4" />
               Settings
             </button>
@@ -71,6 +78,7 @@ export default function Sidebar() {
           </div>
         </div>
       </div>
+      <SettingsModal isOpen={isSettingsOpen} onClose={() => setIsSettingsOpen(false)} />
     </div>
   )
 }
