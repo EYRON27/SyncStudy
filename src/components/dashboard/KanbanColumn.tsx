@@ -11,10 +11,14 @@ interface KanbanColumnProps {
 }
 
 export default function KanbanColumn({ id, title, tasks }: KanbanColumnProps) {
-  const { setNodeRef } = useDroppable({ id })
+  const { setNodeRef, isOver } = useDroppable({ id })
 
   return (
-    <div className="w-[320px] flex-shrink-0 bg-[#121317] border border-gray-800/80 rounded-[20px] p-5 flex flex-col max-h-full">
+    <div 
+      className={`w-[320px] flex-shrink-0 rounded-[20px] p-5 flex flex-col max-h-full transition-colors duration-200 border
+        ${isOver ? 'bg-[#1a1c23] border-[#ff8c37]/50 shadow-[0_0_15px_rgba(255,140,55,0.1)]' : 'bg-[#121317] border-gray-800/80'}
+      `}
+    >
       <div className="flex items-center justify-between mb-5 flex-shrink-0">
         <div className="flex items-center gap-3">
           <h2 className="text-white font-bold text-[15px]">{title}</h2>
