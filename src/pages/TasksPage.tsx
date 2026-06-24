@@ -1,10 +1,19 @@
 import { useState, useEffect } from 'react'
 import Sidebar from '@/components/dashboard/Sidebar'
 import TopBar from '@/components/dashboard/TopBar'
-import { Plus, MoreHorizontal, Loader2 } from 'lucide-react'
+import { Plus, Loader2 } from 'lucide-react'
 import { tasksService } from '@/features/tasks/api/tasks.service'
 import type { Task } from '@/features/tasks/api/tasks.service'
 import AddTaskModal from '@/components/dashboard/AddTaskModal'
+import KanbanColumn from '@/components/dashboard/KanbanColumn'
+import {
+  DndContext,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  closestCorners
+} from '@dnd-kit/core'
+import type { DragEndEvent } from '@dnd-kit/core'
 
 export default function TasksPage() {
   const [tasks, setTasks] = useState<Task[]>([])
@@ -27,12 +36,46 @@ export default function TasksPage() {
     fetchTasks()
   }, [])
 
-  const getPriorityColor = (priority: string) => {
-    switch (priority.toUpperCase()) {
-      case 'HIGH': return 'text-red-500 bg-red-500/10 border-red-500/20'
-      case 'MEDIUM': return 'text-[#ff8c37] bg-[#ff8c37]/10 border-[#ff8c37]/20'
-      case 'LOW': return 'text-blue-500 bg-blue-500/10 border-blue-500/20'
-      default: return 'text-gray-500 bg-gray-500/10 border-gray-500/20'
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 5, // Require 5px movement before dragging starts
+      },
+    })
+  )
+
+  const handleDragEnd = async (event: DragEndEvent) => {
+    const { active, over } = event
+    if (!over) return
+
+    const activeId = active.id as string
+    const overId = over.id as string
+
+    const activeTask = tasks.find(t => t.id === activeId)
+    if (!activeTask) return
+
+    let newStatus = activeTask.status
+
+    if (['todo', 'in-progress', 'review', 'done'].includes(overId)) {
+      newStatus = overId
+    } else {
+      const overTask = tasks.find(t => t.id === overId)
+      if (overTask) {
+        newStatus = overTask.status
+      }
+    }
+
+    if (newStatus !== activeTask.status) {
+      // Optimistic UI Update
+      const previousTasks = [...tasks]
+      setTasks(tasks.map(t => t.id === activeId ? { ...t, status: newStatus } : t))
+
+      try {
+        await tasksService.updateTask(activeId, { status: newStatus })
+      } catch (err) {
+        console.error('Failed to update task status', err)
+        setTasks(previousTasks) // Revert on failure
+      }
     }
   }
 
@@ -73,57 +116,22 @@ export default function TasksPage() {
                 <Loader2 className="w-8 h-8 text-[#ff8c37] animate-spin" />
               </div>
             ) : (
-              <div className="flex gap-6 flex-1 items-start h-full pb-8">
-                {columns.map(column => (
-                  <div key={column.id} className="w-[320px] flex-shrink-0 bg-[#121317] border border-gray-800/80 rounded-[20px] p-5 flex flex-col max-h-full">
-                    <div className="flex items-center justify-between mb-5 flex-shrink-0">
-                      <div className="flex items-center gap-3">
-                        <h2 className="text-white font-bold text-[15px]">{column.title}</h2>
-                        <span className="bg-[#1a1c23] text-gray-400 text-[11px] font-bold px-2 py-0.5 rounded-full">
-                          {column.items.length}
-                        </span>
-                      </div>
-                      <button className="text-gray-500 hover:text-white transition-colors">
-                        <MoreHorizontal className="w-5 h-5" />
-                      </button>
-                    </div>
-
-                    <div className="space-y-4 overflow-y-auto flex-1 pr-1 custom-scrollbar">
-                      {column.items.map((task) => (
-                        <div key={task.id} className="bg-[#16171d] border border-gray-800/60 rounded-[16px] p-5 hover:border-gray-700 transition-colors group cursor-pointer">
-                          <div className="flex justify-between items-start mb-4">
-                            <span className="text-gray-400 text-[11px] font-semibold px-2.5 py-1 bg-[#1e1f26] rounded-md truncate max-w-[150px]">
-                              {task.room?.name || 'General'}
-                            </span>
-                            <span className={`text-[10px] font-bold px-2.5 py-0.5 rounded-full border uppercase tracking-widest ${getPriorityColor(task.priority)}`}>
-                              {task.priority}
-                            </span>
-                          </div>
-                          <h3 className="text-white font-semibold text-[15px] mb-6 group-hover:text-[#ff8c37] transition-colors">
-                            {task.title}
-                          </h3>
-                          <div className="flex justify-between items-center mt-auto">
-                            <div className="flex items-center gap-3 text-gray-500">
-                              {/* Placeholder for comments and attachments */}
-                            </div>
-                            <div className="w-6 h-6 rounded-full bg-[#1853db] flex items-center justify-center text-white text-[9px] font-bold ring-2 ring-[#16171d]">
-                              NA
-                            </div>
-                          </div>
-                        </div>
-                      ))}
-                      
-                      <button 
-                        onClick={() => setIsAddModalOpen(true)}
-                        className="w-full mt-2 py-3.5 rounded-xl border border-dashed border-gray-800 bg-transparent text-gray-500 text-[13px] font-semibold hover:border-gray-500 hover:text-gray-300 transition-colors flex items-center justify-center gap-2"
-                      >
-                        <Plus className="w-4 h-4" />
-                        Add Card
-                      </button>
-                    </div>
-                  </div>
-                ))}
-              </div>
+              <DndContext
+                sensors={sensors}
+                collisionDetection={closestCorners}
+                onDragEnd={handleDragEnd}
+              >
+                <div className="flex gap-6 flex-1 items-start h-full pb-8">
+                  {columns.map(column => (
+                    <KanbanColumn 
+                      key={column.id} 
+                      id={column.id} 
+                      title={column.title} 
+                      tasks={column.items} 
+                    />
+                  ))}
+                </div>
+              </DndContext>
             )}
           </div>
         </main>

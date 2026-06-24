@@ -9,6 +9,7 @@ export interface Task {
   roomId: string
   creatorId: string
   assigneeId?: string
+  dueDate?: string
   createdAt: string
   updatedAt: string
   room?: {
@@ -21,6 +22,7 @@ export interface CreateTaskInput {
   title: string
   priority: string
   status?: string
+  dueDate?: string
 }
 
 export interface UpdateTaskInput {
@@ -28,6 +30,7 @@ export interface UpdateTaskInput {
   status?: string
   priority?: string
   course?: string
+  dueDate?: string
 }
 
 export const tasksService = {

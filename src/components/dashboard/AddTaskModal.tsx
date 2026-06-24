@@ -14,6 +14,7 @@ export default function AddTaskModal({ isOpen, onClose, onTaskCreated }: AddTask
   const [title, setTitle] = useState('')
   const [priority, setPriority] = useState('MEDIUM')
   const [status, setStatus] = useState('todo')
+  const [dueDate, setDueDate] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
 
@@ -31,7 +32,8 @@ export default function AddTaskModal({ isOpen, onClose, onTaskCreated }: AddTask
         course: course.trim(),
         title: title.trim(),
         priority,
-        status
+        status,
+        dueDate: dueDate || undefined
       })
       onTaskCreated()
       onClose()
@@ -39,6 +41,7 @@ export default function AddTaskModal({ isOpen, onClose, onTaskCreated }: AddTask
       setTitle('')
       setPriority('MEDIUM')
       setStatus('todo')
+      setDueDate('')
     } catch (err: any) {
       setError(err.response?.data?.message || 'Failed to create task')
     } finally {
@@ -129,6 +132,16 @@ export default function AddTaskModal({ isOpen, onClose, onTaskCreated }: AddTask
                     <option value="done">Done</option>
                   </select>
                 </div>
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-gray-300">Deadline (Optional)</label>
+                <input
+                  type="date"
+                  value={dueDate}
+                  onChange={(e) => setDueDate(e.target.value)}
+                  className="w-full px-4 py-3 bg-[#16171d] border border-gray-800 rounded-xl text-white focus:outline-none focus:border-[#ff8c37] focus:ring-1 focus:ring-[#ff8c37] transition-all"
+                />
               </div>
 
               <button
