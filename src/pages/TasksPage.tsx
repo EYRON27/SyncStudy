@@ -79,11 +79,28 @@ export default function TasksPage() {
     }
   }
 
+  const getPriorityWeight = (priority: string) => {
+    switch (priority.toUpperCase()) {
+      case 'HIGH': return 3
+      case 'MEDIUM': return 2
+      case 'LOW': return 1
+      default: return 0
+    }
+  }
+
+  const sortedTasks = [...tasks].sort((a, b) => {
+    // Sort by priority (descending)
+    const priorityDiff = getPriorityWeight(b.priority) - getPriorityWeight(a.priority)
+    if (priorityDiff !== 0) return priorityDiff
+    // If priority is same, sort by creation date (newest first)
+    return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+  })
+
   const columns = [
-    { id: 'todo', title: 'To Do', items: tasks.filter(t => t.status === 'todo') },
-    { id: 'in-progress', title: 'In Progress', items: tasks.filter(t => t.status === 'in-progress') },
-    { id: 'review', title: 'Review', items: tasks.filter(t => t.status === 'review') },
-    { id: 'done', title: 'Done', items: tasks.filter(t => t.status === 'done') }
+    { id: 'todo', title: 'To Do', items: sortedTasks.filter(t => t.status === 'todo') },
+    { id: 'in-progress', title: 'In Progress', items: sortedTasks.filter(t => t.status === 'in-progress') },
+    { id: 'review', title: 'Review', items: sortedTasks.filter(t => t.status === 'review') },
+    { id: 'done', title: 'Done', items: sortedTasks.filter(t => t.status === 'done') }
   ]
 
   return (
