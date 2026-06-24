@@ -1,19 +1,31 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import Sidebar from '@/components/dashboard/Sidebar'
 import TopBar from '@/components/dashboard/TopBar'
-import { Users, Settings, Mic, MicOff, Video, MonitorUp, PhoneOff, MessageSquare, Send } from 'lucide-react'
+import { Users, Settings, Mic, MicOff, Video, MonitorUp, PhoneOff, MessageSquare, Send, Loader2 } from 'lucide-react'
 import { roomsService } from '@/features/rooms/api/rooms.service'
 import type { Room } from '@/features/rooms/api/rooms.service'
+import { messagesService } from '@/features/rooms/api/messages.service'
+import type { ChatMessage } from '@/features/rooms/api/messages.service'
+import { useAuthStore } from '@/store/authStore'
+import { useSocket } from '@/hooks/useSocket'
 import CreateRoomModal from '@/components/dashboard/CreateRoomModal'
 import JoinRoomModal from '@/components/dashboard/JoinRoomModal'
 
 export default function StudyRoomsPage() {
   const [rooms, setRooms] = useState<Room[]>([])
   const [activeRoomId, setActiveRoomId] = useState<string | null>(null)
+  const [messages, setMessages] = useState<ChatMessage[]>([])
+  const [msgLoading, setMsgLoading] = useState(false)
+  const [messageInput, setMessageInput] = useState('')
+  const [isMuted, setIsMuted] = useState(false)
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false)
   const [isJoinModalOpen, setIsJoinModalOpen] = useState(false)
+  const messagesEndRef = useRef<HTMLDivElement>(null)
+  const socket = useSocket()
+  const currentUser = useAuthStore(s => s.user)
 
-  const loadRooms = async () => {
+  // ─── Load rooms ────────────────────────────────────────────────────────────
+  const loadRooms = useCallback(async () => {
     try {
       const data = await roomsService.getRooms()
       setRooms(data)
@@ -23,20 +35,106 @@ export default function StudyRoomsPage() {
     } catch (err) {
       console.error('Failed to load rooms:', err)
     }
-  }
+  }, [activeRoomId])
 
   useEffect(() => {
     loadRooms()
   }, [])
 
+  // ─── Load message history & join socket room ───────────────────────────────
+  useEffect(() => {
+    if (!activeRoomId) return
+
+    const loadHistory = async () => {
+      setMsgLoading(true)
+      try {
+        const history = await messagesService.getMessages(activeRoomId)
+        setMessages(history)
+      } catch (err) {
+        console.error('Failed to load messages:', err)
+      } finally {
+        setMsgLoading(false)
+      }
+    }
+
+    loadHistory()
+  }, [activeRoomId])
+
+  // ─── Socket: join/leave rooms, listen for new messages ────────────────────
+  useEffect(() => {
+    if (!socket || !activeRoomId) return
+
+    // Join the new room
+    socket.emit('chat:join', { roomId: activeRoomId })
+
+    // Listen for incoming messages
+    const handleMessage = ({ message }: { message: ChatMessage }) => {
+      setMessages(prev => [...prev, message])
+    }
+    socket.on('chat:message', handleMessage)
+
+    return () => {
+      // Leave when switching rooms
+      socket.emit('chat:leave', { roomId: activeRoomId })
+      socket.off('chat:message', handleMessage)
+    }
+  }, [socket, activeRoomId])
+
+  // ─── Auto-scroll to latest message ────────────────────────────────────────
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
+  }, [messages])
+
+  // ─── Send message ──────────────────────────────────────────────────────────
+  const sendMessage = () => {
+    if (!messageInput.trim() || !socket || !activeRoomId || !currentUser) return
+
+    socket.emit('chat:message', {
+      roomId: activeRoomId,
+      content: messageInput.trim(),
+      senderId: currentUser.id
+    })
+    setMessageInput('')
+  }
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault()
+      sendMessage()
+    }
+  }
+
   const activeRoom = rooms.find(r => r.id === activeRoomId)
 
-  const chatMessages = [
-    { id: 1, user: 'User 1', avatar: 'U1', avatarColor: 'bg-indigo-600', time: '10:42 AM', text: 'Hey everyone! Should we start going over the practice exam?', isYou: false },
-    { id: 2, user: 'User 3', avatar: 'U3', avatarColor: 'bg-[#e65c00]', time: '10:43 AM', text: "Yeah let's do it.", isYou: false },
-    { id: 3, user: 'You', avatar: 'AL', avatarColor: 'bg-[#ff8c37]', time: '10:44 AM', text: "Yes. I'm stuck on question 4. Can someone explain the time complexity part?", isYou: true },
-    { id: 4, user: 'User 2', avatar: 'U2', avatarColor: 'bg-emerald-600', time: '10:45 AM', text: "I think it's O(n log n) because of the sorting step.", isYou: false },
-  ]
+  // ─── Helpers ───────────────────────────────────────────────────────────────
+  const getInitials = (name: string) =>
+    name.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2)
+
+  const formatTime = (date: string) =>
+    new Date(date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+
+  const formatDateLabel = (date: string) => {
+    const d = new Date(date)
+    const today = new Date()
+    if (d.toDateString() === today.toDateString()) return 'Today'
+    return d.toLocaleDateString(undefined, { month: 'short', day: 'numeric' })
+  }
+
+  // Group messages by date
+  const groupedMessages = messages.reduce<{ label: string; msgs: ChatMessage[] }[]>((groups, msg) => {
+    const label = formatDateLabel(msg.createdAt)
+    const last = groups[groups.length - 1]
+    if (last && last.label === label) {
+      last.msgs.push(msg)
+    } else {
+      groups.push({ label, msgs: [msg] })
+    }
+    return groups
+  }, [])
+
+  const avatarColors = ['bg-indigo-600', 'bg-emerald-600', 'bg-[#e65c00]', 'bg-purple-600', 'bg-pink-600', 'bg-teal-600']
+  const getAvatarColor = (userId: string) =>
+    avatarColors[userId.charCodeAt(0) % avatarColors.length]
 
   return (
     <div className="flex h-screen bg-[#0f1015] font-sans overflow-hidden">
@@ -98,7 +196,7 @@ export default function StudyRoomsPage() {
                           {room._count?.members || 1} members
                         </div>
                         <div className="text-[10px] text-gray-500 font-mono bg-[#121317] px-2 py-0.5 rounded border border-gray-800">
-                          Code: {room.code}
+                          {room.code}
                         </div>
                       </div>
                     </div>
@@ -111,24 +209,19 @@ export default function StudyRoomsPage() {
                 {/* Video Header */}
                 <div className="p-6 border-b border-gray-800/50 flex justify-between items-start">
                   <div>
-                    <h2 className="text-white font-bold text-lg mb-1">{activeRoom ? activeRoom.name : 'Select a room'}</h2>
-                    <p className="text-gray-400 text-[13px] font-medium">{activeRoom?.description || 'Collaborate with your peers.'}</p>
+                    <h2 className="text-white font-bold text-lg mb-1">
+                      {activeRoom ? activeRoom.name : 'Select a room'}
+                    </h2>
+                    <p className="text-gray-400 text-[13px] font-medium">
+                      {activeRoom?.description || 'Collaborate with your peers.'}
+                    </p>
                   </div>
-                  <div className="flex items-center gap-4">
-                    <div className="flex -space-x-2">
-                      <div className="w-8 h-8 rounded-full bg-[#4a5578] border-2 border-[#121317] flex items-center justify-center text-white text-[10px] font-bold z-40">U1</div>
-                      <div className="w-8 h-8 rounded-full bg-[#4a6378] border-2 border-[#121317] flex items-center justify-center text-white text-[10px] font-bold z-30">U2</div>
-                      <div className="w-8 h-8 rounded-full bg-[#524a78] border-2 border-[#121317] flex items-center justify-center text-white text-[10px] font-bold z-20">U3</div>
-                      <div className="w-8 h-8 rounded-full bg-[#4a7876] border-2 border-[#121317] flex items-center justify-center text-white text-[10px] font-bold z-10">U4</div>
-                      <div className="w-8 h-8 rounded-full bg-[#1a1c23] border-2 border-[#121317] flex items-center justify-center text-gray-300 text-[10px] font-bold z-0">+8</div>
-                    </div>
-                    <button className="w-8 h-8 rounded-full bg-[#1a1c23] flex items-center justify-center text-gray-400 hover:text-white transition-colors border border-gray-800">
-                      <Settings className="w-4 h-4" />
-                    </button>
-                  </div>
+                  <button className="w-8 h-8 rounded-full bg-[#1a1c23] flex items-center justify-center text-gray-400 hover:text-white transition-colors border border-gray-800">
+                    <Settings className="w-4 h-4" />
+                  </button>
                 </div>
 
-                {/* Video Grid */}
+                {/* Video Grid placeholder */}
                 <div className="flex-1 p-6 grid grid-cols-2 gap-4">
                   {[1, 2, 3, 4].map((userNum) => (
                     <div key={userNum} className="bg-[#16171d] rounded-[16px] relative flex items-center justify-center overflow-hidden border border-gray-800/50 group">
@@ -143,8 +236,11 @@ export default function StudyRoomsPage() {
 
                 {/* Video Controls */}
                 <div className="h-[80px] border-t border-gray-800/50 flex items-center justify-center gap-4 px-6 bg-[#121317]">
-                  <button className="w-12 h-12 rounded-full bg-[#1a1c23] flex items-center justify-center text-gray-400 hover:text-white hover:bg-[#252836] transition-colors">
-                    <Mic className="w-5 h-5" />
+                  <button 
+                    onClick={() => setIsMuted(!isMuted)}
+                    className={`w-12 h-12 rounded-full flex items-center justify-center transition-colors ${isMuted ? 'bg-red-500/20 text-red-400 border border-red-500/30' : 'bg-[#1a1c23] text-gray-400 hover:text-white hover:bg-[#252836]'}`}
+                  >
+                    {isMuted ? <MicOff className="w-5 h-5" /> : <Mic className="w-5 h-5" />}
                   </button>
                   <button className="w-12 h-12 rounded-full bg-[#1a1c23] flex items-center justify-center text-gray-400 hover:text-white hover:bg-[#252836] transition-colors">
                     <Video className="w-5 h-5" />
@@ -163,43 +259,92 @@ export default function StudyRoomsPage() {
                 <div className="p-5 border-b border-gray-800/50 flex items-center gap-3">
                   <MessageSquare className="w-5 h-5 text-[#ff8c37]" />
                   <h2 className="text-white font-bold text-[15px]">Room Chat</h2>
+                  {socket?.connected && (
+                    <div className="ml-auto flex items-center gap-1.5">
+                      <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                      <span className="text-emerald-400 text-[10px] font-semibold">Live</span>
+                    </div>
+                  )}
                 </div>
                 
-                <div className="flex-1 overflow-y-auto p-5 custom-scrollbar flex flex-col gap-6">
-                  <div className="text-center text-[10px] font-bold text-gray-500 uppercase tracking-wider">
-                    Today, 10:30 AM
-                  </div>
-                  
-                  {chatMessages.map(msg => (
-                    <div key={msg.id} className={`flex gap-3 ${msg.isYou ? 'flex-row-reverse' : ''}`}>
-                      <div className={`w-8 h-8 rounded-full ${msg.avatarColor} flex-shrink-0 flex items-center justify-center text-white text-[10px] font-bold`}>
-                        {msg.avatar}
-                      </div>
-                      <div className={`flex flex-col ${msg.isYou ? 'items-end' : 'items-start'} max-w-[80%]`}>
-                        <div className="flex items-center gap-2 mb-1.5">
-                          <span className="text-gray-300 text-[11px] font-semibold">{msg.user}</span>
-                          <span className="text-gray-600 text-[10px] font-medium">{msg.time}</span>
-                        </div>
-                        <div className={`p-3.5 rounded-[14px] text-[13px] leading-relaxed ${
-                          msg.isYou 
-                            ? 'bg-[#ff8c37]/10 border border-[#ff8c37]/30 text-[#ff8c37] rounded-tr-sm' 
-                            : 'bg-[#1a1c23] border border-gray-800/80 text-gray-300 rounded-tl-sm'
-                        }`}>
-                          {msg.text}
-                        </div>
-                      </div>
+                {/* Messages */}
+                <div className="flex-1 overflow-y-auto p-5 custom-scrollbar flex flex-col gap-4">
+                  {msgLoading ? (
+                    <div className="flex-1 flex items-center justify-center">
+                      <Loader2 className="w-6 h-6 text-[#ff8c37] animate-spin" />
                     </div>
-                  ))}
+                  ) : !activeRoomId ? (
+                    <div className="flex-1 flex items-center justify-center text-gray-500 text-sm text-center">
+                      Select a room to start chatting
+                    </div>
+                  ) : messages.length === 0 ? (
+                    <div className="flex-1 flex items-center justify-center text-gray-500 text-sm text-center">
+                      No messages yet.<br/>Be the first to say hi! 👋
+                    </div>
+                  ) : (
+                    groupedMessages.map(group => (
+                      <div key={group.label}>
+                        <div className="text-center text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-4">
+                          {group.label}
+                        </div>
+                        <div className="flex flex-col gap-4">
+                          {group.msgs.map(msg => {
+                            const isMe = msg.senderId === currentUser?.id
+                            return (
+                              <div key={msg.id} className={`flex gap-3 ${isMe ? 'flex-row-reverse' : ''}`}>
+                                {msg.sender.avatarUrl ? (
+                                  <img
+                                    src={msg.sender.avatarUrl}
+                                    alt={msg.sender.name}
+                                    className="w-8 h-8 rounded-full flex-shrink-0 object-cover"
+                                  />
+                                ) : (
+                                  <div className={`w-8 h-8 rounded-full ${getAvatarColor(msg.senderId)} flex-shrink-0 flex items-center justify-center text-white text-[10px] font-bold`}>
+                                    {getInitials(msg.sender.name)}
+                                  </div>
+                                )}
+                                <div className={`flex flex-col ${isMe ? 'items-end' : 'items-start'} max-w-[80%]`}>
+                                  <div className="flex items-center gap-2 mb-1">
+                                    <span className="text-gray-300 text-[11px] font-semibold">
+                                      {isMe ? 'You' : msg.sender.name}
+                                    </span>
+                                    <span className="text-gray-600 text-[10px]">{formatTime(msg.createdAt)}</span>
+                                  </div>
+                                  <div className={`p-3 rounded-[14px] text-[13px] leading-relaxed break-words ${
+                                    isMe 
+                                      ? 'bg-[#ff8c37]/10 border border-[#ff8c37]/30 text-[#ff8c37] rounded-tr-sm' 
+                                      : 'bg-[#1a1c23] border border-gray-800/80 text-gray-300 rounded-tl-sm'
+                                  }`}>
+                                    {msg.content}
+                                  </div>
+                                </div>
+                              </div>
+                            )
+                          })}
+                        </div>
+                      </div>
+                    ))
+                  )}
+                  <div ref={messagesEndRef} />
                 </div>
 
+                {/* Input */}
                 <div className="p-4 border-t border-gray-800/50">
                   <div className="relative flex items-center">
                     <input 
                       type="text" 
-                      placeholder="Type a message..." 
-                      className="w-full bg-[#1a1c23] border border-gray-800/80 rounded-full py-3 pl-4 pr-12 text-[13px] text-white placeholder-gray-500 focus:outline-none focus:border-[#ff8c37]/50 focus:ring-1 focus:ring-[#ff8c37]/50 transition-all"
+                      value={messageInput}
+                      onChange={e => setMessageInput(e.target.value)}
+                      onKeyDown={handleKeyDown}
+                      placeholder={activeRoomId ? 'Type a message... (Enter to send)' : 'Select a room first'}
+                      disabled={!activeRoomId || !socket?.connected}
+                      className="w-full bg-[#1a1c23] border border-gray-800/80 rounded-full py-3 pl-4 pr-12 text-[13px] text-white placeholder-gray-500 focus:outline-none focus:border-[#ff8c37]/50 focus:ring-1 focus:ring-[#ff8c37]/50 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                     />
-                    <button className="absolute right-2 w-8 h-8 rounded-full bg-[#2a2d3c] flex items-center justify-center text-gray-300 hover:text-white hover:bg-[#ff8c37] transition-colors">
+                    <button 
+                      onClick={sendMessage}
+                      disabled={!messageInput.trim() || !socket?.connected}
+                      className="absolute right-2 w-8 h-8 rounded-full bg-[#2a2d3c] flex items-center justify-center text-gray-300 hover:text-white hover:bg-[#ff8c37] transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                    >
                       <Send className="w-4 h-4 -ml-0.5" />
                     </button>
                   </div>
