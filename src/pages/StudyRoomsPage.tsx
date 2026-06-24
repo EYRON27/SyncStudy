@@ -1,14 +1,35 @@
+import { useState, useEffect } from 'react'
 import Sidebar from '@/components/dashboard/Sidebar'
 import TopBar from '@/components/dashboard/TopBar'
 import { Users, Settings, Mic, MicOff, Video, MonitorUp, PhoneOff, MessageSquare, Send } from 'lucide-react'
+import { roomsService } from '@/features/rooms/api/rooms.service'
+import type { Room } from '@/features/rooms/api/rooms.service'
+import CreateRoomModal from '@/components/dashboard/CreateRoomModal'
+import JoinRoomModal from '@/components/dashboard/JoinRoomModal'
 
 export default function StudyRoomsPage() {
-  const activeRooms = [
-    { id: 1, name: 'CS-101 Final Prep', online: 12, isActive: true },
-    { id: 2, name: 'Math Study Group', online: 5, isActive: false },
-    { id: 3, name: 'Silent Library', online: 45, isActive: false },
-    { id: 4, name: 'Project Team A', online: 4, isActive: false },
-  ]
+  const [rooms, setRooms] = useState<Room[]>([])
+  const [activeRoomId, setActiveRoomId] = useState<string | null>(null)
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false)
+  const [isJoinModalOpen, setIsJoinModalOpen] = useState(false)
+
+  const loadRooms = async () => {
+    try {
+      const data = await roomsService.getRooms()
+      setRooms(data)
+      if (data.length > 0 && !activeRoomId) {
+        setActiveRoomId(data[0].id)
+      }
+    } catch (err) {
+      console.error('Failed to load rooms:', err)
+    }
+  }
+
+  useEffect(() => {
+    loadRooms()
+  }, [])
+
+  const activeRoom = rooms.find(r => r.id === activeRoomId)
 
   const chatMessages = [
     { id: 1, user: 'User 1', avatar: 'U1', avatarColor: 'bg-indigo-600', time: '10:42 AM', text: 'Hey everyone! Should we start going over the practice exam?', isYou: false },
@@ -32,9 +53,20 @@ export default function StudyRoomsPage() {
                 <h1 className="text-3xl font-bold text-white mb-2">Study Rooms</h1>
                 <p className="text-gray-400 text-[14px]">Collaborate with peers in real-time.</p>
               </div>
-              <button className="px-6 py-2.5 rounded-full bg-gradient-to-r from-[#ff8c37] to-[#e65c00] text-white text-[14px] font-bold hover:opacity-90 transition-opacity shadow-[0_4px_14px_rgba(255,140,55,0.3)]">
-                Create Room
-              </button>
+              <div className="flex gap-4">
+                <button 
+                  onClick={() => setIsJoinModalOpen(true)}
+                  className="px-6 py-2.5 rounded-full bg-[#1a1c23] border border-gray-700 text-white text-[14px] font-bold hover:bg-[#252836] transition-colors"
+                >
+                  Join Room
+                </button>
+                <button 
+                  onClick={() => setIsCreateModalOpen(true)}
+                  className="px-6 py-2.5 rounded-full bg-gradient-to-r from-[#ff8c37] to-[#e65c00] text-white text-[14px] font-bold hover:opacity-90 transition-opacity shadow-[0_4px_14px_rgba(255,140,55,0.3)]"
+                >
+                  Create Room
+                </button>
+              </div>
             </div>
 
             {/* Main Content Grid */}
@@ -46,19 +78,28 @@ export default function StudyRoomsPage() {
                   <h2 className="text-white font-bold text-[15px]">Active Rooms</h2>
                 </div>
                 <div className="space-y-2 overflow-y-auto flex-1 custom-scrollbar">
-                  {activeRooms.map(room => (
+                  {rooms.length === 0 && (
+                    <div className="text-center text-gray-500 text-sm py-4">No rooms joined yet.</div>
+                  )}
+                  {rooms.map(room => (
                     <div 
                       key={room.id}
+                      onClick={() => setActiveRoomId(room.id)}
                       className={`p-4 rounded-[14px] cursor-pointer transition-colors ${
-                        room.isActive 
+                        activeRoomId === room.id 
                           ? 'bg-[#1a1c23] border border-gray-700/60' 
                           : 'hover:bg-[#1a1c23]/50 border border-transparent'
                       }`}
                     >
                       <h3 className="text-white font-semibold text-[14px] mb-2">{room.name}</h3>
-                      <div className="flex items-center gap-1.5 text-[11px] font-medium text-emerald-400">
-                        <div className="w-1.5 h-1.5 rounded-full bg-emerald-500"></div>
-                        {room.online} online
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-1.5 text-[11px] font-medium text-emerald-400">
+                          <div className="w-1.5 h-1.5 rounded-full bg-emerald-500"></div>
+                          {room._count?.members || 1} members
+                        </div>
+                        <div className="text-[10px] text-gray-500 font-mono bg-[#121317] px-2 py-0.5 rounded border border-gray-800">
+                          Code: {room.code}
+                        </div>
                       </div>
                     </div>
                   ))}
@@ -70,8 +111,8 @@ export default function StudyRoomsPage() {
                 {/* Video Header */}
                 <div className="p-6 border-b border-gray-800/50 flex justify-between items-start">
                   <div>
-                    <h2 className="text-white font-bold text-lg mb-1">CS-101 Final Prep</h2>
-                    <p className="text-gray-400 text-[13px] font-medium">Discussing chapter 8 algorithms.</p>
+                    <h2 className="text-white font-bold text-lg mb-1">{activeRoom ? activeRoom.name : 'Select a room'}</h2>
+                    <p className="text-gray-400 text-[13px] font-medium">{activeRoom?.description || 'Collaborate with your peers.'}</p>
                   </div>
                   <div className="flex items-center gap-4">
                     <div className="flex -space-x-2">
@@ -166,6 +207,18 @@ export default function StudyRoomsPage() {
               </div>
 
             </div>
+
+            {/* Modals */}
+            <CreateRoomModal 
+              isOpen={isCreateModalOpen} 
+              onClose={() => setIsCreateModalOpen(false)} 
+              onRoomCreated={loadRooms} 
+            />
+            <JoinRoomModal 
+              isOpen={isJoinModalOpen} 
+              onClose={() => setIsJoinModalOpen(false)} 
+              onRoomJoined={loadRooms} 
+            />
           </div>
         </main>
       </div>
