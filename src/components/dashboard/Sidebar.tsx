@@ -1,11 +1,19 @@
 import { useState } from 'react'
-import { Link, useLocation } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { LayoutDashboard, CheckSquare, Users, DollarSign, FileText, Settings, LogOut } from 'lucide-react'
 import SettingsModal from './SettingsModal'
+import { useAuthStore } from '@/store/authStore'
 
 export default function Sidebar() {
   const location = useLocation()
+  const navigate = useNavigate()
   const [isSettingsOpen, setIsSettingsOpen] = useState(false)
+  const { user, logout } = useAuthStore()
+
+  const handleLogout = () => {
+    logout()
+    navigate('/')
+  }
 
   const isActive = (path: string) => location.pathname === path
 
@@ -57,10 +65,11 @@ export default function Sidebar() {
         <div className="bg-[#13141a] border border-gray-800/80 rounded-[16px] p-4">
           <div className="flex items-center gap-3 mb-4">
             <div className="w-10 h-10 rounded-full bg-[#1a1c23] flex items-center justify-center text-[#ff8c37] font-bold border border-gray-800">
-              AL
+              {user?.name?.slice(0, 2).toUpperCase() || 'NA'}
             </div>
-            <div>
-              <div className="text-white font-semibold text-[15px]">Alex Dev</div>
+            <div className="flex-1 min-w-0">
+              <div className="text-white font-semibold text-[15px] truncate">{user?.name || 'User'}</div>
+              <div className="text-gray-500 text-[12px] truncate">{user?.email || ''}</div>
             </div>
           </div>
           <div className="space-y-1">
@@ -71,7 +80,10 @@ export default function Sidebar() {
               <Settings className="w-4 h-4" />
               Settings
             </button>
-            <button className="w-full flex items-center gap-3 px-2 py-2 rounded-lg text-gray-400 hover:text-white hover:bg-[#1a1c23] transition-colors text-sm font-medium">
+            <button 
+              onClick={handleLogout}
+              className="w-full flex items-center gap-3 px-2 py-2 rounded-lg text-gray-400 hover:text-white hover:bg-[#1a1c23] transition-colors text-sm font-medium"
+            >
               <LogOut className="w-4 h-4" />
               Logout
             </button>

@@ -1,17 +1,35 @@
+import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { X, Mail, Key } from 'lucide-react'
 import LandingPage from './LandingPage'
 import { useAuthStore } from '@/store/authStore'
+import { authService } from '@/features/auth/api/auth.service'
 
 export default function LoginPage() {
   const navigate = useNavigate()
   const login = useAuthStore((state) => state.login)
+  
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [error, setError] = useState('')
+  const [loading, setLoading] = useState(false)
 
-  const handleBypassLogin = (e?: React.FormEvent | React.MouseEvent) => {
-    e?.preventDefault()
-    login({ id: '1', name: 'Alex Dev', email: 'alex@example.com' }, 'fake-jwt-token')
-    navigate('/dashboard')
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setError('')
+    setLoading(true)
+    try {
+      const res = await authService.login({ email, password })
+      if (res.success && res.data) {
+        login(res.data.user, res.data.token)
+        navigate('/dashboard')
+      }
+    } catch (err: any) {
+      setError(err.response?.data?.message || 'Login failed. Please verify your credentials.')
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
@@ -53,13 +71,22 @@ export default function LoginPage() {
           </div>
 
           {/* Form */}
-          <form onSubmit={handleBypassLogin} className="flex flex-col gap-4">
+          <form onSubmit={handleLogin} className="flex flex-col gap-4">
+            {error && (
+              <div className="bg-red-500/10 border border-red-500/50 text-red-400 text-[13px] px-4 py-2.5 rounded-xl font-medium">
+                {error}
+              </div>
+            )}
+            
             <div>
               <label className="block text-[13px] font-semibold text-gray-300 mb-1.5 ml-1">Email</label>
               <div className="relative">
                 <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
                 <input
                   type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
                   placeholder="you@university.edu"
                   className="w-full bg-[#13141a] border border-gray-800/80 rounded-xl py-3 pl-11 pr-4 text-[14px] text-white placeholder-gray-600 focus:outline-none focus:border-[#ff8c37] focus:ring-1 focus:ring-[#ff8c37] transition-all"
                 />
@@ -72,6 +99,9 @@ export default function LoginPage() {
                 <Key className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
                 <input
                   type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
                   placeholder="••••••••"
                   className="w-full bg-[#13141a] border border-gray-800/80 rounded-xl py-3 pl-11 pr-4 text-[14px] text-white placeholder-gray-600 focus:outline-none focus:border-[#ff8c37] focus:ring-1 focus:ring-[#ff8c37] transition-all tracking-[0.2em]"
                 />
@@ -85,9 +115,18 @@ export default function LoginPage() {
 
             <button
               type="submit"
-              className="w-full mt-3 py-3.5 rounded-full bg-gradient-to-r from-[#ff8c37] to-[#e65c00] text-white text-[15px] font-bold hover:opacity-90 transition-opacity shadow-[0_4px_14px_rgba(255,140,55,0.3)]"
+              disabled={loading}
+              className="w-full mt-3 py-3.5 rounded-full bg-gradient-to-r from-[#ff8c37] to-[#e65c00] text-white text-[15px] font-bold hover:opacity-90 transition-opacity shadow-[0_4px_14px_rgba(255,140,55,0.3)] disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
             >
-              Sign In
+              {loading ? (
+                <motion.div
+                  animate={{ rotate: 360 }}
+                  transition={{ repeat: Infinity, duration: 1, ease: "linear" }}
+                  className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full"
+                />
+              ) : (
+                'Sign In'
+              )}
             </button>
           </form>
 
@@ -101,8 +140,7 @@ export default function LoginPage() {
           {/* Social Login */}
           <button
             type="button"
-            onClick={handleBypassLogin}
-            className="w-full flex items-center justify-center gap-3 py-3 rounded-full bg-[#13141a] border border-gray-800/80 text-[14px] text-gray-300 font-semibold hover:bg-gray-800/40 hover:text-white transition-all"
+            className="w-full flex items-center justify-center gap-3 py-3 rounded-full bg-[#13141a] border border-gray-800/80 text-[14px] text-gray-300 font-semibold hover:bg-gray-800/40 hover:text-white transition-all opacity-50 cursor-not-allowed"
           >
             <svg viewBox="0 0 24 24" className="w-[18px] h-[18px]" fill="none" xmlns="http://www.w3.org/2000/svg">
               <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
