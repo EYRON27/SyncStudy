@@ -10,14 +10,32 @@ export interface AuthResponse {
   }
 }
 
+export interface RegisterResponse {
+  success: boolean
+  message: string
+  data: {
+    email: string
+  }
+}
+
 export const authService = {
   login: async (credentials: Record<string, string>): Promise<AuthResponse> => {
     const response = await api.post<AuthResponse>('/auth/login', credentials)
     return response.data
   },
 
-  register: async (data: Record<string, string>): Promise<AuthResponse> => {
-    const response = await api.post<AuthResponse>('/auth/register', data)
+  register: async (data: Record<string, string>): Promise<RegisterResponse> => {
+    const response = await api.post<RegisterResponse>('/auth/register', data)
+    return response.data
+  },
+
+  verifyOtp: async (email: string, code: string): Promise<AuthResponse> => {
+    const response = await api.post<AuthResponse>('/auth/verify-otp', { email, code })
+    return response.data
+  },
+
+  googleLogin: async (googleToken: string): Promise<AuthResponse> => {
+    const response = await api.post<AuthResponse>('/auth/google', { googleToken })
     return response.data
   },
 }

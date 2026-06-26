@@ -5,6 +5,7 @@ import { X, Mail, Key } from 'lucide-react'
 import LandingPage from './LandingPage'
 import { useAuthStore } from '@/store/authStore'
 import { authService } from '@/features/auth/api/auth.service'
+import { useGoogleLogin } from '@react-oauth/google'
 
 export default function LoginPage() {
   const navigate = useNavigate()
@@ -31,6 +32,23 @@ export default function LoginPage() {
       setLoading(false)
     }
   }
+
+  const handleGoogleSuccess = async (tokenResponse: any) => {
+    try {
+      const res = await authService.googleLogin(tokenResponse.access_token)
+      if (res.success && res.data) {
+        login(res.data.user, res.data.token)
+        navigate('/dashboard')
+      }
+    } catch (err: any) {
+      setError(err.response?.data?.message || 'Google sign-in failed. Please try again.')
+    }
+  }
+
+  const googleLogin = useGoogleLogin({
+    onSuccess: handleGoogleSuccess,
+    onError: () => setError('Google sign-in was cancelled or failed.'),
+  })
 
   return (
     <div className="relative min-h-screen bg-[#0f1015] font-sans">
@@ -140,7 +158,8 @@ export default function LoginPage() {
           {/* Social Login */}
           <button
             type="button"
-            className="w-full flex items-center justify-center gap-3 py-3 rounded-full bg-[#13141a] border border-gray-800/80 text-[14px] text-gray-300 font-semibold hover:bg-gray-800/40 hover:text-white transition-all opacity-50 cursor-not-allowed"
+            onClick={() => googleLogin()}
+            className="w-full flex items-center justify-center gap-3 py-3 rounded-full bg-[#13141a] border border-gray-800/80 text-[14px] text-gray-300 font-semibold hover:bg-gray-800/40 hover:text-white transition-all"
           >
             <svg viewBox="0 0 24 24" className="w-[18px] h-[18px]" fill="none" xmlns="http://www.w3.org/2000/svg">
               <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
