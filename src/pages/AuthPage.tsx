@@ -330,6 +330,13 @@ export default function AuthPage({ initialView = 'login' }: { initialView?: 'log
             </button>
           </form>
 
+          {/* Divider */}
+          <div className="flex items-center my-5">
+            <div className="flex-1 border-t border-gray-800/60"></div>
+            <span className="px-4 text-[11px] text-gray-500 uppercase tracking-wider font-medium">or</span>
+            <div className="flex-1 border-t border-gray-800/60"></div>
+          </div>
+
           <GoogleButton text="Sign up with Google" />
 
           {/* Mobile Only Toggle */}
