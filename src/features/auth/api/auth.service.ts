@@ -38,4 +38,14 @@ export const authService = {
     const response = await api.post<AuthResponse>('/auth/google', { googleToken })
     return response.data
   },
+
+  forgotPassword: async (email: string): Promise<{ success: boolean; message: string }> => {
+    const response = await api.post('/auth/forgot-password', { email })
+    return response.data
+  },
+
+  resetPassword: async (data: Record<string, string>): Promise<{ success: boolean; message: string }> => {
+    const response = await api.post('/auth/reset-password', data)
+    return response.data
+  },
 }
