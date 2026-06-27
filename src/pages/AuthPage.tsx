@@ -253,7 +253,7 @@ export default function AuthPage({ initialView = 'login' }: { initialView?: 'log
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   required
-                  placeholder="Alex Dev"
+                  placeholder="Enter your full name"
                   className="w-full bg-[#13141a] border border-gray-800/80 rounded-xl py-2.5 pl-11 pr-4 text-[14px] text-white focus:outline-none focus:border-[#ff8c37] focus:ring-1 focus:ring-[#ff8c37]"
                 />
               </div>
