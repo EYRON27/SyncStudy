@@ -37,7 +37,8 @@ export default function ForgotPasswordPage() {
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          className="absolute inset-0 bg-[#0f1015]/80 backdrop-blur-md"
+          onClick={() => navigate('/')}
+          className="absolute inset-0 bg-[#0f1015]/80 backdrop-blur-md cursor-pointer"
         />
 
         <motion.div

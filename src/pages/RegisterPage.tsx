@@ -84,7 +84,8 @@ export default function RegisterPage() {
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          className="absolute inset-0 bg-[#0f1015]/80 backdrop-blur-md"
+          onClick={() => navigate('/')}
+          className="absolute inset-0 bg-[#0f1015]/80 backdrop-blur-md cursor-pointer"
         />
 
         <motion.div
@@ -172,7 +173,7 @@ export default function RegisterPage() {
                 </button>
               </div>
 
-              {(passwordFocused || password.length > 0) && (
+              {passwordFocused && (
                 <motion.div
                   initial={{ opacity: 0, height: 0 }}
                   animate={{ opacity: 1, height: 'auto' }}
