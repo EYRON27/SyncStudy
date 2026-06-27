@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { X, Mail, Key, User } from 'lucide-react'
+import { X, Mail, Key, User, Eye, EyeOff, Check } from 'lucide-react'
 import LandingPage from './LandingPage'
 import { authService } from '@/features/auth/api/auth.service'
 import { useGoogleLogin } from '@react-oauth/google'
@@ -14,12 +14,33 @@ export default function RegisterPage() {
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [confirmPassword, setConfirmPassword] = useState('')
+  const [showPassword, setShowPassword] = useState(false)
+  const [passwordFocused, setPasswordFocused] = useState(false)
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
+
+  const passwordRequirements = [
+    { label: 'At least 8 characters long', met: password.length >= 8 },
+    { label: 'One uppercase letter', met: /[A-Z]/.test(password) },
+    { label: 'One lowercase letter', met: /[a-z]/.test(password) },
+    { label: 'One special character', met: /[^a-zA-Z0-9]/.test(password) },
+  ]
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault()
     setError('')
+    
+    if (password !== confirmPassword) {
+      setError('Passwords do not match')
+      return
+    }
+
+    if (!passwordRequirements.every(req => req.met)) {
+      setError('Please meet all password requirements')
+      return
+    }
+
     setLoading(true)
     try {
       const res = await authService.register({ name, email, password })
@@ -132,13 +153,57 @@ export default function RegisterPage() {
               <div className="relative">
                 <Key className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
                 <input
-                  type="password"
+                  type={showPassword ? 'text' : 'password'}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
+                  onFocus={() => setPasswordFocused(true)}
+                  onBlur={() => setPasswordFocused(false)}
                   required
-                  minLength={6}
+                  minLength={8}
                   placeholder="••••••••"
-                  className="w-full bg-[#13141a] border border-gray-800/80 rounded-xl py-3 pl-11 pr-4 text-[14px] text-white placeholder-gray-600 focus:outline-none focus:border-[#ff8c37] focus:ring-1 focus:ring-[#ff8c37] transition-all tracking-[0.2em]"
+                  className={`w-full bg-[#13141a] border border-gray-800/80 rounded-xl py-3 pl-11 pr-12 text-[14px] text-white placeholder-gray-600 focus:outline-none focus:border-[#ff8c37] focus:ring-1 focus:ring-[#ff8c37] transition-all ${!showPassword ? 'tracking-[0.2em]' : ''}`}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-300 transition-colors"
+                >
+                  {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                </button>
+              </div>
+
+              {(passwordFocused || password.length > 0) && (
+                <motion.div
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: 'auto' }}
+                  className="mt-3 bg-[#13141a]/50 border border-gray-800/80 rounded-xl p-3.5 space-y-2.5"
+                >
+                  {passwordRequirements.map((req, i) => (
+                    <div key={i} className="flex items-center gap-2.5 text-[12px]">
+                      <div className={`flex items-center justify-center w-4 h-4 rounded-full transition-colors duration-300 ${req.met ? 'bg-emerald-500/20 text-emerald-500' : 'bg-gray-800/50 text-gray-500'}`}>
+                        {req.met ? <Check className="w-3 h-3" /> : <X className="w-2.5 h-2.5" />}
+                      </div>
+                      <span className={`transition-colors duration-300 ${req.met ? 'text-gray-300 font-medium' : 'text-gray-500'}`}>
+                        {req.label}
+                      </span>
+                    </div>
+                  ))}
+                </motion.div>
+              )}
+            </div>
+
+            <div>
+              <label className="block text-[13px] font-semibold text-gray-300 mb-1.5 ml-1">Confirm Password</label>
+              <div className="relative">
+                <Key className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
+                <input
+                  type={showPassword ? 'text' : 'password'}
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  required
+                  minLength={8}
+                  placeholder="••••••••"
+                  className={`w-full bg-[#13141a] border border-gray-800/80 rounded-xl py-3 pl-11 pr-12 text-[14px] text-white placeholder-gray-600 focus:outline-none focus:border-[#ff8c37] focus:ring-1 focus:ring-[#ff8c37] transition-all ${!showPassword ? 'tracking-[0.2em]' : ''}`}
                 />
               </div>
             </div>

@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from 'react'
 import { useNavigate, useLocation, Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { Loader2, KeyRound, Key } from 'lucide-react'
+import { Loader2, KeyRound, Key, Eye, EyeOff, Check, X } from 'lucide-react'
 import { authService } from '@/features/auth/api/auth.service'
 import LandingPage from './LandingPage'
 
@@ -13,6 +13,9 @@ export default function ResetPasswordPage() {
 
   const [digits, setDigits] = useState<string[]>(['', '', '', '', '', ''])
   const [newPassword, setNewPassword] = useState('')
+  const [confirmPassword, setConfirmPassword] = useState('')
+  const [showPassword, setShowPassword] = useState(false)
+  const [passwordFocused, setPasswordFocused] = useState(false)
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
   const [loading, setLoading] = useState(false)
@@ -55,6 +58,24 @@ export default function ResetPasswordPage() {
       setError('Please enter the full 6-digit code')
       return
     }
+
+    if (newPassword !== confirmPassword) {
+      setError('Passwords do not match')
+      return
+    }
+
+    const passwordRequirements = [
+      { met: newPassword.length >= 8 },
+      { met: /[A-Z]/.test(newPassword) },
+      { met: /[a-z]/.test(newPassword) },
+      { met: /[^a-zA-Z0-9]/.test(newPassword) },
+    ]
+
+    if (!passwordRequirements.every(req => req.met)) {
+      setError('Please meet all password requirements')
+      return
+    }
+
     setError('')
     setLoading(true)
     try {
@@ -141,14 +162,64 @@ export default function ResetPasswordPage() {
               <div className="relative">
                 <Key className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
                 <input
-                  type="password"
+                  type={showPassword ? 'text' : 'password'}
                   value={newPassword}
                   onChange={(e) => setNewPassword(e.target.value)}
+                  onFocus={() => setPasswordFocused(true)}
+                  onBlur={() => setPasswordFocused(false)}
                   required
                   disabled={!!success}
                   minLength={8}
                   placeholder="••••••••"
-                  className="w-full bg-[#13141a] border border-gray-800/80 rounded-xl py-3 pl-11 pr-4 text-[14px] text-white placeholder-gray-600 focus:outline-none focus:border-[#ff8c37] focus:ring-1 focus:ring-[#ff8c37] transition-all tracking-[0.2em] disabled:opacity-50"
+                  className={`w-full bg-[#13141a] border border-gray-800/80 rounded-xl py-3 pl-11 pr-12 text-[14px] text-white placeholder-gray-600 focus:outline-none focus:border-[#ff8c37] focus:ring-1 focus:ring-[#ff8c37] transition-all disabled:opacity-50 ${!showPassword ? 'tracking-[0.2em]' : ''}`}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-300 transition-colors"
+                >
+                  {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                </button>
+              </div>
+
+              {(passwordFocused || newPassword.length > 0) && (
+                <motion.div
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: 'auto' }}
+                  className="mt-3 bg-[#13141a]/50 border border-gray-800/80 rounded-xl p-3.5 space-y-2.5"
+                >
+                  {[
+                    { label: 'At least 8 characters long', met: newPassword.length >= 8 },
+                    { label: 'One uppercase letter', met: /[A-Z]/.test(newPassword) },
+                    { label: 'One lowercase letter', met: /[a-z]/.test(newPassword) },
+                    { label: 'One special character', met: /[^a-zA-Z0-9]/.test(newPassword) },
+                  ].map((req, i) => (
+                    <div key={i} className="flex items-center gap-2.5 text-[12px]">
+                      <div className={`flex items-center justify-center w-4 h-4 rounded-full transition-colors duration-300 ${req.met ? 'bg-emerald-500/20 text-emerald-500' : 'bg-gray-800/50 text-gray-500'}`}>
+                        {req.met ? <Check className="w-3 h-3" /> : <X className="w-2.5 h-2.5" />}
+                      </div>
+                      <span className={`transition-colors duration-300 ${req.met ? 'text-gray-300 font-medium' : 'text-gray-500'}`}>
+                        {req.label}
+                      </span>
+                    </div>
+                  ))}
+                </motion.div>
+              )}
+            </div>
+
+            <div className="mb-6">
+              <label className="block text-[13px] font-semibold text-gray-300 mb-1.5 ml-1">Confirm Password</label>
+              <div className="relative">
+                <Key className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
+                <input
+                  type={showPassword ? 'text' : 'password'}
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  required
+                  disabled={!!success}
+                  minLength={8}
+                  placeholder="••••••••"
+                  className={`w-full bg-[#13141a] border border-gray-800/80 rounded-xl py-3 pl-11 pr-12 text-[14px] text-white placeholder-gray-600 focus:outline-none focus:border-[#ff8c37] focus:ring-1 focus:ring-[#ff8c37] transition-all disabled:opacity-50 ${!showPassword ? 'tracking-[0.2em]' : ''}`}
                 />
               </div>
             </div>
