@@ -1,8 +1,6 @@
 import { motion } from 'framer-motion'
 import { Star, ArrowRight } from 'lucide-react'
 import { Link } from 'react-router-dom'
-import Navbar from '@/components/Navbar'
-import Footer from '@/components/Footer'
 
 const testimonials = [
   { name: "Sarah Chen", role: "CS Junior, MIT", initial: "SC", text: "SyncStudy completely changed how I organize my semester. The AI assistant alone saves me hours every week." },
@@ -15,12 +13,10 @@ const testimonials = [
 
 export default function TestimonialsPage() {
   return (
-    <div className="min-h-screen bg-[#0f1015] text-white font-sans relative overflow-hidden">
+    <div className="bg-[#0f1015] text-white font-sans relative overflow-hidden">
       {/* Background Glows */}
       <div className="absolute top-[20%] left-[20%] w-[800px] h-[800px] bg-[#ff8c37]/5 rounded-full blur-[150px] pointer-events-none" />
       
-      <Navbar />
-
       <main className="container mx-auto px-6 pt-40 pb-24 relative z-10">
         {/* Hero */}
         <div className="flex flex-col items-center text-center mb-24">
@@ -101,8 +97,6 @@ export default function TestimonialsPage() {
           </Link>
         </motion.div>
       </main>
-
-      <Footer />
     </div>
   )
 }

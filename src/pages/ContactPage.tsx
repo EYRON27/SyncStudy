@@ -1,16 +1,12 @@
 import { motion } from 'framer-motion'
 import { Mail, MapPin } from 'lucide-react'
-import Navbar from '@/components/Navbar'
-import Footer from '@/components/Footer'
 
 export default function ContactPage() {
   return (
-    <div className="min-h-screen bg-[#0f1015] text-white font-sans relative overflow-hidden">
+    <div className="bg-[#0f1015] text-white font-sans relative overflow-hidden">
       <div className="absolute top-[20%] left-[10%] w-[600px] h-[600px] bg-[#ff8c37]/10 rounded-full blur-[150px] pointer-events-none" />
       <div className="absolute bottom-[10%] right-[10%] w-[500px] h-[500px] bg-blue-500/10 rounded-full blur-[150px] pointer-events-none" />
       
-      <Navbar />
-
       <main className="container mx-auto px-6 pt-40 pb-32 relative z-10 max-w-4xl">
         <div className="flex flex-col items-center text-center mb-20">
           <motion.div
@@ -72,8 +68,6 @@ export default function ContactPage() {
           </div>
         </motion.div>
       </main>
-
-      <Footer />
     </div>
   )
 }

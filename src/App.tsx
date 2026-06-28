@@ -16,18 +16,23 @@ import StudyRoomsPage from '@/pages/StudyRoomsPage'
 import ExpensesPage from '@/pages/ExpensesPage'
 import NotesPage from '@/pages/NotesPage'
 import ProtectedRoute from '@/router/ProtectedRoute'
+import PublicLayout from '@/layouts/PublicLayout'
 
 function App() {
   return (
     <Routes>
-      {/* Public routes */}
-      <Route path="/" element={<LandingPage />} />
-      <Route path="/about" element={<AboutPage />} />
-      <Route path="/services" element={<ServicesPage />} />
-      <Route path="/testimonials" element={<TestimonialsPage />} />
-      <Route path="/privacy" element={<PrivacyPage />} />
-      <Route path="/terms" element={<TermsPage />} />
-      <Route path="/contact" element={<ContactPage />} />
+      {/* Public routes with Navbar & Footer */}
+      <Route element={<PublicLayout />}>
+        <Route path="/" element={<LandingPage />} />
+        <Route path="/about" element={<AboutPage />} />
+        <Route path="/services" element={<ServicesPage />} />
+        <Route path="/testimonials" element={<TestimonialsPage />} />
+        <Route path="/privacy" element={<PrivacyPage />} />
+        <Route path="/terms" element={<TermsPage />} />
+        <Route path="/contact" element={<ContactPage />} />
+      </Route>
+
+      {/* Auth routes (no Navbar) */}
       <Route path="/login" element={<AuthPage initialView="login" />} />
       <Route path="/register" element={<AuthPage initialView="register" />} />
       <Route path="/verify-otp" element={<OtpPage />} />

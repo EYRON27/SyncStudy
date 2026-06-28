@@ -1,14 +1,10 @@
 import { motion } from 'framer-motion'
-import Navbar from '@/components/Navbar'
-import Footer from '@/components/Footer'
 
 export default function PrivacyPage() {
   return (
-    <div className="min-h-screen bg-[#0f1015] text-white font-sans relative overflow-hidden">
+    <div className="bg-[#0f1015] text-white font-sans relative overflow-hidden">
       <div className="absolute top-[10%] left-[-10%] w-[500px] h-[500px] bg-blue-500/10 rounded-full blur-[150px] pointer-events-none" />
       
-      <Navbar />
-
       <main className="container mx-auto px-6 pt-40 pb-24 relative z-10 max-w-4xl">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -67,8 +63,6 @@ export default function PrivacyPage() {
           </div>
         </motion.div>
       </main>
-
-      <Footer />
     </div>
   )
 }
