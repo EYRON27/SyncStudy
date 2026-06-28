@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Link, useNavigate, useLocation } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
-import { X, Mail, Key, User, Eye, EyeOff, Check, ArrowRight } from 'lucide-react'
+import { X, Mail, Key, User, Eye, EyeOff, Check } from 'lucide-react'
 import { authService } from '@/features/auth/api/auth.service'
 import { useGoogleLogin } from '@react-oauth/google'
 import { useAuthStore } from '@/store/authStore'
