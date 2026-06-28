@@ -1,27 +1,6 @@
-import { useRef } from 'react'
-import { motion, useInView } from 'framer-motion'
+import { motion } from 'framer-motion'
 import { Star } from 'lucide-react'
 
-// ─── Animated stat counter ────────────────────────────────
-export function Stat({ value, label, accent }: { value: string; label: string; accent: string }) {
-  const ref = useRef<HTMLDivElement>(null)
-  const inView = useInView(ref, { once: true })
-  return (
-    <div ref={ref} className="flex flex-col items-center gap-1">
-      <motion.span
-        initial={{ opacity: 0, y: 12 }}
-        animate={inView ? { opacity: 1, y: 0 } : {}}
-        transition={{ duration: 0.5 }}
-        className="text-5xl font-black text-white tracking-tighter"
-      >
-        {value}
-      </motion.span>
-      <span className={`text-[12px] font-bold uppercase tracking-widest ${accent}`}>{label}</span>
-    </div>
-  )
-}
-
-// ─── Bento service card ───────────────────────────────────
 const GLOW_COLOR: Record<string, string> = {
   'text-[#ff8c37]': 'bg-[#ff8c37]',
   'text-blue-400': 'bg-blue-500',
