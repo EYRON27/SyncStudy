@@ -1,6 +1,9 @@
 import { Routes, Route, Navigate } from 'react-router-dom'
 import LandingPage from '@/pages/LandingPage'
 import AuthPage from '@/pages/AuthPage'
+import AboutPage from '@/pages/AboutPage'
+import ServicesPage from '@/pages/ServicesPage'
+import TestimonialsPage from '@/pages/TestimonialsPage'
 import OtpPage from '@/pages/OtpPage'
 import ForgotPasswordPage from '@/pages/ForgotPasswordPage'
 import ResetPasswordPage from '@/pages/ResetPasswordPage'
@@ -16,6 +19,9 @@ function App() {
     <Routes>
       {/* Public routes */}
       <Route path="/" element={<LandingPage />} />
+      <Route path="/about" element={<AboutPage />} />
+      <Route path="/services" element={<ServicesPage />} />
+      <Route path="/testimonials" element={<TestimonialsPage />} />
       <Route path="/login" element={<AuthPage initialView="login" />} />
       <Route path="/register" element={<AuthPage initialView="register" />} />
       <Route path="/verify-otp" element={<OtpPage />} />
