@@ -1,6 +1,7 @@
-import { useRef } from 'react'
+import { useRef, useState, useEffect } from 'react'
 import { motion, useInView } from 'framer-motion'
 import { Zap, Shield, Sparkles, Globe } from 'lucide-react'
+import { statsService, type LandingStats } from '@/features/stats/api/stats.service'
 
 const FEATURES = [
   { icon: Zap,      title: 'Lightning Fast', desc: 'Real-time sync across all devices. No lag.',   color: 'text-[#ff8c37]',  bg: 'bg-[#ff8c37]/10'  },
@@ -9,13 +10,7 @@ const FEATURES = [
   { icon: Globe,    title: 'Works Offline',  desc: 'Core features run without internet.',          color: 'text-emerald-400', bg: 'bg-emerald-400/10'},
 ]
 
-const STATS = [
-  { value: '50K+', label: 'Active Students', accent: 'text-[#ff8c37]' },
-  { value: '200+', label: 'Universities',    accent: 'text-blue-400'   },
-  { value: '4.9★', label: 'Avg. Rating',     accent: 'text-purple-400' },
-]
-
-function AnimatedStat({ value, label, accent }: { value: string; label: string; accent: string }) {
+function AnimatedStat({ value, label, accent }: { value: string | number; label: string; accent: string }) {
   const ref = useRef<HTMLDivElement>(null)
   const inView = useInView(ref, { once: true, margin: '-60px' })
   return (
@@ -41,6 +36,20 @@ function AnimatedStat({ value, label, accent }: { value: string; label: string; 
 }
 
 export function AboutSection() {
+  const [stats, setStats] = useState<LandingStats | null>(null)
+
+  useEffect(() => {
+    statsService.getLandingStats()
+      .then(setStats)
+      .catch(console.error)
+  }, [])
+
+  const displayStats = [
+    { value: stats ? stats.usersCount : '-', label: 'Active Students', accent: 'text-[#ff8c37]' },
+    { value: stats ? stats.roomsCount : '-', label: 'Study Rooms',     accent: 'text-blue-400'   },
+    { value: stats ? `${stats.avgRating}★` : '-', label: 'Avg. Rating',     accent: 'text-purple-400' },
+  ]
+
   return (
     <section id="about" className="py-28 relative">
       <div className="container mx-auto px-6 max-w-[1100px]">
@@ -92,10 +101,10 @@ export function AboutSection() {
           transition={{ duration: 0.6, delay: 0.15 }}
           className="grid grid-cols-3 gap-0 mb-16 bg-[#121318] border border-white/[0.07] rounded-[24px] overflow-hidden"
         >
-          {STATS.map(({ value, label, accent }, i) => (
+          {displayStats.map(({ value, label, accent }, i) => (
             <div
               key={label}
-              className={`flex flex-col items-center justify-center py-10 px-4 text-center ${i < STATS.length - 1 ? 'border-r border-white/[0.06]' : ''}`}
+              className={`flex flex-col items-center justify-center py-10 px-4 text-center ${i < displayStats.length - 1 ? 'border-r border-white/[0.06]' : ''}`}
             >
               <AnimatedStat value={value} label={label} accent={accent} />
             </div>
