@@ -42,10 +42,13 @@ export function ServicesSection() {
         >
           <Link
             to="/register"
-            className="group inline-flex items-center gap-2 px-8 py-3.5 rounded-2xl border border-white/[0.1] bg-white/[0.04] text-[14px] font-semibold text-gray-300 hover:bg-white/[0.08] hover:text-white hover:border-white/20 transition-all"
+            className="group relative inline-flex items-center justify-center gap-2 px-8 py-3.5 rounded-2xl text-[14px] font-bold text-white overflow-hidden"
+            style={{ boxShadow: '0 0 0 1px rgba(255,255,255,0.1) inset, 0 4px 25px rgba(255,140,55,0.25)' }}
           >
-            Explore All Features
-            <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
+            <span className="absolute inset-0 bg-gradient-to-r from-[#ff8c37] to-[#e05500] transition-all duration-300 group-hover:brightness-110" />
+            <span className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/30 to-transparent" />
+            <span className="relative">Explore All Features</span>
+            <ArrowRight className="relative w-4 h-4 group-hover:translate-x-1 transition-transform duration-200" />
           </Link>
         </motion.div>
       </div>

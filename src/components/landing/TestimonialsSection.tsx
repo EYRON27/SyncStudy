@@ -70,9 +70,12 @@ export function TestimonialsSection() {
           
           <button 
             onClick={() => setIsModalOpen(true)}
-            className="bg-white/5 hover:bg-white/10 text-white border border-white/10 px-6 py-2.5 rounded-full font-medium transition-all"
+            className="group relative overflow-hidden inline-flex items-center justify-center px-7 py-3 rounded-full text-[14px] font-bold text-white transition-all"
+            style={{ boxShadow: '0 0 0 1px rgba(255,255,255,0.1) inset, 0 4px 20px rgba(255,140,55,0.25)' }}
           >
-            Leave a Review
+            <span className="absolute inset-0 bg-gradient-to-r from-[#ff8c37] to-[#e05500] transition-all duration-300 group-hover:brightness-110" />
+            <span className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/30 to-transparent" />
+            <span className="relative">Leave a Review</span>
           </button>
         </div>
 
