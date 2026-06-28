@@ -1,8 +1,9 @@
-import { useRef } from 'react'
+import { useRef, useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { motion, useScroll, useTransform } from 'framer-motion'
 import { ArrowRight, Zap, Shield, Globe, ChevronDown } from 'lucide-react'
 import { GridBg, Orbs } from '@/components/landing/Backgrounds'
+import { statsService } from '@/features/stats/api/stats.service'
 
 const TRUST_BADGES = [
   { icon: Shield, label: 'SOC 2 Compliant', color: 'text-blue-400'    },
@@ -76,6 +77,14 @@ export function HeroSection() {
   const { scrollYProgress } = useScroll({ target: heroRef, offset: ['start start', 'end start'] })
   const heroY       = useTransform(scrollYProgress, [0, 1], ['0%', '20%'])
   const heroOpacity = useTransform(scrollYProgress, [0, 0.55], [1, 0])
+
+  const [usersCount, setUsersCount] = useState<string | number>('50k+')
+
+  useEffect(() => {
+    statsService.getLandingStats()
+      .then(stats => setUsersCount(stats.usersCount))
+      .catch(console.error)
+  }, [])
 
   return (
     <section
@@ -166,7 +175,7 @@ export function HeroSection() {
             <span key={label} className="flex items-center gap-1.5">
               {i > 0 && <span className="w-px h-3 bg-gray-800 mr-3" />}
               <Icon className={`w-3.5 h-3.5 ${color}`} />
-              {label}
+              {i === 2 ? `${usersCount} Students` : label}
             </span>
           ))}
         </motion.div>
