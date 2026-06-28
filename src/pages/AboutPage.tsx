@@ -1,8 +1,18 @@
+import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { Shield, Zap, Sparkles, Globe, ArrowRight } from 'lucide-react'
 import { Link } from 'react-router-dom'
+import { statsService, type LandingStats } from '@/features/stats/api/stats.service'
 
 export default function AboutPage() {
+  const [stats, setStats] = useState<LandingStats | null>(null)
+
+  useEffect(() => {
+    statsService.getLandingStats()
+      .then(setStats)
+      .catch(console.error)
+  }, [])
+
   return (
     <div className="bg-[#0f1015] text-white font-sans relative overflow-hidden">
       {/* Background Glows */}
@@ -50,15 +60,15 @@ export default function AboutPage() {
           <div className="absolute inset-0 bg-gradient-to-r from-[#ff8c37]/5 to-blue-500/5 pointer-events-none" />
           <div className="grid grid-cols-1 md:grid-cols-3 gap-10 relative z-10 text-center">
             <div className="flex flex-col items-center gap-2">
-              <span className="text-6xl font-black text-white tracking-tighter">50K+</span>
+              <span className="text-6xl font-black text-white tracking-tighter">{stats ? stats.usersCount : '-'}</span>
               <span className="text-sm text-[#ff8c37] font-bold tracking-widest uppercase">Active Students</span>
             </div>
             <div className="flex flex-col items-center gap-2 border-y md:border-y-0 md:border-x border-gray-800/50 py-10 md:py-0">
-              <span className="text-6xl font-black text-white tracking-tighter">200+</span>
-              <span className="text-sm text-blue-400 font-bold tracking-widest uppercase">Universities</span>
+              <span className="text-6xl font-black text-white tracking-tighter">{stats ? stats.roomsCount : '-'}</span>
+              <span className="text-sm text-blue-400 font-bold tracking-widest uppercase">Study Rooms</span>
             </div>
             <div className="flex flex-col items-center gap-2">
-              <span className="text-6xl font-black text-white tracking-tighter">4.9★</span>
+              <span className="text-6xl font-black text-white tracking-tighter">{stats ? `${stats.avgRating}★` : '-'}</span>
               <span className="text-sm text-purple-400 font-bold tracking-widest uppercase">Average Rating</span>
             </div>
           </div>

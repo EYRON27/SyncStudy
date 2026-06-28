@@ -1,17 +1,18 @@
+import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { Star, ArrowRight } from 'lucide-react'
 import { Link } from 'react-router-dom'
-
-const testimonials = [
-  { name: "Sarah Chen", role: "CS Junior, MIT", initial: "SC", text: "SyncStudy completely changed how I organize my semester. The AI assistant alone saves me hours every week." },
-  { name: "Marcus Williams", role: "Pre-Med, Johns Hopkins", initial: "MW", text: "The study rooms feature is incredible for group sessions. It feels like a real library, but online." },
-  { name: "Amelia Torres", role: "Engineering, Stanford", initial: "AT", text: "Finally an app that gets student life. Budget tracking + notes + tasks in one place is a game changer." },
-  { name: "David Kim", role: "Business, NYU", initial: "DK", text: "I used to have 4 different subscriptions for flashcards, notes, and task management. SyncStudy replaced all of them for a fraction of the cost." },
-  { name: "Jessica Fox", role: "Law, Harvard", initial: "JF", text: "The AI document summarization is insanely accurate. It helps me digest hundreds of pages of case law before my study groups." },
-  { name: "Omar Hassan", role: "Architecture, UCL", initial: "OH", text: "The visual interface is gorgeous. It actually makes me want to log in and look at my pending assignments instead of avoiding them." }
-]
+import { testimonialsService, type Testimonial } from '@/features/testimonials/api/testimonials.service'
 
 export default function TestimonialsPage() {
+  const [testimonials, setTestimonials] = useState<Testimonial[]>([])
+
+  useEffect(() => {
+    testimonialsService.getAll()
+      .then(setTestimonials)
+      .catch(console.error)
+  }, [])
+
   return (
     <div className="bg-[#0f1015] text-white font-sans relative overflow-hidden">
       {/* Background Glows */}
@@ -50,9 +51,9 @@ export default function TestimonialsPage() {
 
         {/* Masonry / Grid */}
         <div className="columns-1 md:columns-2 lg:columns-3 gap-6 max-w-7xl mx-auto mb-32 space-y-6">
-          {testimonials.map((testi, i) => (
+          {testimonials.map((t, i) => (
             <motion.div
-              key={i}
+              key={t.id || t.name + i}
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
@@ -65,15 +66,15 @@ export default function TestimonialsPage() {
                 ))}
               </div>
               <p className="text-gray-300 text-[16px] leading-relaxed mb-8 font-medium">
-                "{testi.text}"
+                "{t.text}"
               </p>
               <div className="flex items-center gap-4 border-t border-gray-800/50 pt-6">
                 <div className="w-12 h-12 rounded-full bg-gradient-to-br from-gray-800 to-gray-900 flex items-center justify-center text-gray-300 text-sm font-bold border border-gray-700 shadow-inner">
-                  {testi.initial}
+                  {t.initials || 'User'}
                 </div>
                 <div className="flex flex-col">
-                  <span className="text-white font-bold text-[15px]">{testi.name}</span>
-                  <span className="text-[#ff8c37] text-[12px] font-medium">{testi.role}</span>
+                  <span className="text-white font-bold text-[15px]">{t.name}</span>
+                  <span className="text-[#ff8c37] text-[12px] font-medium">{t.role}</span>
                 </div>
               </div>
             </motion.div>
