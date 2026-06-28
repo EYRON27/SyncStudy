@@ -4,30 +4,6 @@ import { testimonialsService, type Testimonial } from '@/features/testimonials/a
 import { motion, AnimatePresence } from 'framer-motion'
 import { X, Star, Loader2 } from 'lucide-react'
 
-const HARDCODED_TESTIMONIALS = [
-  {
-    name: 'Sarah Chen',
-    role: 'CS Junior, MIT',
-    initials: 'SC',
-    text: 'SyncStudy completely changed how I organize my semester. The AI assistant alone saves me hours every week.',
-    rating: 5,
-  },
-  {
-    name: 'Marcus Williams',
-    role: 'Pre-Med, Johns Hopkins',
-    initials: 'MW',
-    text: 'The study rooms feature is incredible for group sessions. It feels like a real library, but online.',
-    rating: 5,
-  },
-  {
-    name: 'Amelia Torres',
-    role: 'Engineering, Stanford',
-    initials: 'AT',
-    text: 'Finally an app that gets student life. Budget tracking + notes + tasks in one place is a game changer.',
-    rating: 5,
-  },
-]
-
 export function TestimonialsSection() {
   const [testimonials, setTestimonials] = useState<Testimonial[]>([])
   const [isModalOpen, setIsModalOpen] = useState(false)
@@ -40,8 +16,8 @@ export function TestimonialsSection() {
     }).catch(console.error)
   }, [])
 
-  // Combine fetched testimonials with hardcoded ones, and show the latest 3 to 6
-  const displayTestimonials = [...testimonials, ...HARDCODED_TESTIMONIALS].slice(0, 6)
+  // Display only real testimonials from the backend, up to a maximum of 6
+  const displayTestimonials = testimonials.slice(0, 6)
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
