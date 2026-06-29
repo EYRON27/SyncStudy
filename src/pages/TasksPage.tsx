@@ -103,11 +103,21 @@ export default function TasksPage() {
   const confirmDeleteTask = async () => {
     if (!taskToDelete) return
     const taskId = taskToDelete
+    const task = tasks.find(t => t.id === taskId)
     setTaskToDelete(null)
     const previousTasks = [...tasks]
     try {
       setTasks(prev => prev.filter(t => t.id !== taskId))
       await tasksService.deleteTask(taskId)
+      
+      // Also delete the associated room if it exists
+      if (task?.roomId) {
+        try {
+          await roomsService.deleteRoom(task.roomId)
+        } catch (roomErr) {
+          console.error('Could not delete room associated with task:', roomErr)
+        }
+      }
     } catch (err) {
       console.error('Failed to delete task', err)
       setTasks(previousTasks)

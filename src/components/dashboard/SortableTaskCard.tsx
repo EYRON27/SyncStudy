@@ -70,7 +70,7 @@ export default function SortableTaskCard({ task, onDelete }: SortableTaskCardPro
           {task.dueDate && (
             <div className={`flex items-center gap-1.5 text-[11px] font-medium ${isOverdue ? 'text-red-500' : 'text-gray-400'}`}>
               <Calendar className="w-3.5 h-3.5" />
-              {new Date(task.dueDate).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
+              {new Date(task.dueDate).toLocaleString(undefined, { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' })}
             </div>
           )}
         </div>
