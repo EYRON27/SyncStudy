@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { X, Loader2, Type } from 'lucide-react'
+import { X, Loader2, Type, Check } from 'lucide-react'
 import { expensesService } from '@/features/expenses/api/expenses.service'
 import type { CreateExpenseInput } from '@/features/expenses/api/expenses.service'
 
@@ -17,6 +17,7 @@ export default function AddExpenseModal({ isOpen, onClose, onExpenseAdded, curre
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isCustomCategory, setIsCustomCategory] = useState(false)
   const [customCategoryVal, setCustomCategoryVal] = useState('')
+  const [userCategories, setUserCategories] = useState<string[]>([])
 
   const [formData, setFormData] = useState<CreateExpenseInput>({
     title: '',
@@ -24,6 +25,18 @@ export default function AddExpenseModal({ isOpen, onClose, onExpenseAdded, curre
     amount: 0,
     type: 'expense',
   })
+
+  const handleAddCustomCategory = () => {
+    const val = customCategoryVal.trim();
+    if (val) {
+      if (!DEFAULT_CATEGORIES.includes(val) && !userCategories.includes(val)) {
+        setUserCategories([...userCategories, val]);
+      }
+      setFormData({...formData, category: val});
+      setIsCustomCategory(false);
+      setCustomCategoryVal('');
+    }
+  }
 
   // Reset state when modal opens/closes
   React.useEffect(() => {
@@ -138,22 +151,38 @@ export default function AddExpenseModal({ isOpen, onClose, onExpenseAdded, curre
                   <label className="block text-[13px] font-semibold text-gray-400 mb-2">Category</label>
                   
                   {isCustomCategory ? (
-                    <div className="relative flex items-center gap-2">
-                      <input 
-                        required 
-                        autoFocus
-                        type="text" 
-                        value={customCategoryVal}
-                        onChange={e => setCustomCategoryVal(e.target.value)}
-                        placeholder="New category..."
-                        className="w-full bg-[#1a1c23] border border-[#ff8c37]/50 ring-1 ring-[#ff8c37]/50 rounded-xl px-4 py-3.5 text-[15px] font-medium text-white focus:outline-none transition-all placeholder:text-gray-600"
-                      />
-                      <button 
+                    <div className="flex items-center gap-2">
+                      <div className="relative flex-1">
+                        <input 
+                          required 
+                          autoFocus
+                          type="text" 
+                          value={customCategoryVal}
+                          onChange={e => setCustomCategoryVal(e.target.value)}
+                          onKeyDown={e => {
+                            if (e.key === 'Enter') {
+                              e.preventDefault();
+                              handleAddCustomCategory();
+                            }
+                          }}
+                          placeholder="New category..."
+                          className="w-full bg-[#1a1c23] border border-[#ff8c37]/50 ring-1 ring-[#ff8c37]/50 rounded-xl px-4 py-3.5 text-[15px] font-medium text-white focus:outline-none transition-all placeholder:text-gray-600"
+                        />
+                        <button 
+                          type="button"
+                          onClick={() => setIsCustomCategory(false)}
+                          className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-white"
+                        >
+                          <X className="w-4 h-4" />
+                        </button>
+                      </div>
+                      <button
                         type="button"
-                        onClick={() => setIsCustomCategory(false)}
-                        className="absolute right-3 text-gray-500 hover:text-white"
+                        onClick={handleAddCustomCategory}
+                        disabled={!customCategoryVal.trim()}
+                        className="bg-[#ff8c37]/20 text-[#ff8c37] hover:bg-[#ff8c37] hover:text-white border border-[#ff8c37]/50 disabled:opacity-50 disabled:hover:bg-[#ff8c37]/20 disabled:hover:text-[#ff8c37] transition-colors p-3.5 rounded-xl flex items-center justify-center"
                       >
-                        <X className="w-4 h-4" />
+                        <Check className="w-5 h-5" />
                       </button>
                     </div>
                   ) : (
@@ -170,7 +199,7 @@ export default function AddExpenseModal({ isOpen, onClose, onExpenseAdded, curre
                         className="w-full bg-[#1a1c23] border border-gray-800 rounded-xl px-4 py-3.5 text-[15px] font-medium text-white focus:outline-none focus:border-[#ff8c37]/50 focus:ring-1 focus:ring-[#ff8c37]/50 appearance-none transition-all cursor-pointer"
                         disabled={formData.type === 'income'}
                       >
-                        {DEFAULT_CATEGORIES.map(cat => (
+                        {[...DEFAULT_CATEGORIES, ...userCategories].map(cat => (
                           <option key={cat} value={cat}>{cat}</option>
                         ))}
                         <option value="ADD_NEW_CUSTOM" className="font-bold text-[#ff8c37]">+ Add custom category...</option>
