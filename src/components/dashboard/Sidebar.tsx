@@ -11,8 +11,10 @@ export default function Sidebar() {
   const { user, logout } = useAuthStore()
 
   const handleLogout = () => {
-    logout()
-    navigate('/')
+    if (window.confirm("Are you sure you want to log out?")) {
+      logout()
+      navigate('/')
+    }
   }
 
   const isActive = (path: string) => location.pathname === path

@@ -1,6 +1,8 @@
 import { X, Moon, Mail, Bell, Mic, Camera, LogOut } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { createPortal } from 'react-dom'
+import { useNavigate } from 'react-router-dom'
+import { useAuthStore } from '@/store/authStore'
 
 interface SettingsModalProps {
   isOpen: boolean
@@ -8,6 +10,17 @@ interface SettingsModalProps {
 }
 
 export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
+  const navigate = useNavigate()
+  const { logout } = useAuthStore()
+
+  const handleLogout = () => {
+    if (window.confirm("Are you sure you want to log out?")) {
+      logout()
+      onClose()
+      navigate('/')
+    }
+  }
+
   const modalContent = (
     <AnimatePresence>
       {isOpen && (
@@ -133,7 +146,10 @@ export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
               </div>
 
               {/* Sign Out */}
-              <button className="w-full py-3.5 rounded-[14px] border border-red-500/30 text-red-500 hover:bg-red-500/10 transition-colors flex items-center justify-center gap-2 text-[13px] font-bold mt-4">
+              <button 
+                onClick={handleLogout}
+                className="w-full py-3.5 rounded-[14px] border border-red-500/30 text-red-500 hover:bg-red-500/10 transition-colors flex items-center justify-center gap-2 text-[13px] font-bold mt-4"
+              >
                 <LogOut className="w-4 h-4" />
                 Sign Out
               </button>
