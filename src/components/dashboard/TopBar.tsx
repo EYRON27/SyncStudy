@@ -41,17 +41,20 @@ export default function TopBar() {
         >
           {isLightMode ? <Moon className="w-5 h-5" /> : <Sun className="w-5 h-5" />}
         </button>
-        <button 
-          onClick={() => setIsNotifModalOpen(true)}
-          className="p-2 rounded-full text-gray-400 hover:text-white hover:bg-[#1a1c23] transition-colors relative"
-        >
-          <Bell className="w-5 h-5" />
-          <span className="absolute top-2 right-2 w-2 h-2 bg-[#ff8c37] rounded-full border-2 border-[#0f1015]"></span>
-        </button>
+        
+        <div className="relative">
+          <button 
+            onClick={() => setIsNotifModalOpen(true)}
+            className="p-2 rounded-full text-gray-400 hover:text-white hover:bg-[#1a1c23] transition-colors relative"
+          >
+            <Bell className="w-5 h-5" />
+            <span className="absolute top-2 right-2 w-2 h-2 bg-[#ff8c37] rounded-full border-2 border-[#0f1015]"></span>
+          </button>
+          <NotificationsModal isOpen={isNotifModalOpen} onClose={() => setIsNotifModalOpen(false)} />
+        </div>
       </div>
 
       <AskAIModal isOpen={isAIModalOpen} onClose={() => setIsAIModalOpen(false)} />
-      <NotificationsModal isOpen={isNotifModalOpen} onClose={() => setIsNotifModalOpen(false)} />
     </div>
   )
 }

@@ -1,6 +1,5 @@
-import { X, Clock, Users, AlertCircle, CheckCircle2, Info } from 'lucide-react'
+import { Clock, Users, AlertCircle, CheckCircle2, Info } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { createPortal } from 'react-dom'
 
 interface NotificationsModalProps {
   isOpen: boolean
@@ -56,81 +55,77 @@ export default function NotificationsModal({ isOpen, onClose }: NotificationsMod
     }
   ]
 
-  const modalContent = (
+  return (
     <AnimatePresence>
       {isOpen && (
-        <div className="fixed inset-0 z-[9999] flex items-center justify-center">
-          {/* Backdrop */}
-          <motion.div 
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            onClick={onClose}
-            className="absolute inset-0 bg-[#0f1015]/80 backdrop-blur-sm"
-          />
+        <>
+          {/* Invisible backdrop for clicking outside */}
+          <div className="fixed inset-0 z-[9998]" onClick={onClose} />
           
-          {/* Modal */}
           <motion.div 
-            initial={{ opacity: 0, scale: 0.95, y: 10 }}
+            initial={{ opacity: 0, scale: 0.95, y: -10 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.95, y: 10 }}
+            exit={{ opacity: 0, scale: 0.95, y: -10 }}
             transition={{ duration: 0.2 }}
-            className="relative w-full max-w-[500px] bg-[#121317] border border-gray-800 rounded-[20px] shadow-[0_20px_50px_rgba(0,0,0,0.5)] p-6 overflow-hidden mx-4"
+            className="absolute top-full mt-3 right-0 z-[9999] w-[380px] bg-[#121317] border border-gray-800 rounded-[20px] shadow-[0_20px_60px_rgba(0,0,0,0.6)] p-5 overflow-hidden origin-top-right"
           >
             {/* Header */}
-            <div className="flex items-center justify-between mb-6">
-              <div className="flex items-center gap-3">
-                <h2 className="text-white font-bold text-[18px]">Notifications</h2>
-                <div className="px-2.5 py-0.5 rounded-full bg-[#ff8c37] text-white text-[10px] font-bold tracking-wide">
+            <div className="flex items-center justify-between mb-5">
+              <div className="flex items-center gap-2">
+                <h2 className="text-white font-bold text-[16px]">Notifications</h2>
+                <div className="px-2 py-0.5 rounded-md bg-[#ff8c37]/10 text-[#ff8c37] border border-[#ff8c37]/20 text-[10px] font-bold tracking-wide">
                   3 new
                 </div>
               </div>
-              <div className="flex items-center gap-5">
-                <button className="text-[#ff8c37] text-[12px] font-bold hover:underline">
+              <div className="flex items-center gap-4">
+                <button className="text-gray-400 text-[11px] font-semibold hover:text-white transition-colors">
                   Mark all read
-                </button>
-                <button 
-                  onClick={onClose}
-                  className="text-gray-500 hover:text-white transition-colors"
-                >
-                  <X className="w-4 h-4" />
                 </button>
               </div>
             </div>
 
+            {/* Filters (Like Facebook) */}
+            <div className="flex gap-2 mb-4">
+              <button className="px-3 py-1.5 rounded-full bg-[#1a1c23] text-white text-[12px] font-bold border border-gray-700">
+                All
+              </button>
+              <button className="px-3 py-1.5 rounded-full text-gray-400 hover:bg-[#1a1c23] hover:text-white text-[12px] font-bold transition-colors">
+                Unread
+              </button>
+            </div>
+
             {/* List */}
-            <div className="space-y-3 max-h-[60vh] overflow-y-auto custom-scrollbar pr-2">
+            <div className="space-y-1 max-h-[400px] overflow-y-auto custom-scrollbar pr-1 -mr-1">
               {notifications.map((notif) => (
                 <div 
                   key={notif.id}
-                  className={`relative flex items-start gap-4 p-4 rounded-[16px] transition-colors ${
+                  className={`relative flex items-start gap-3 p-3 rounded-[12px] transition-colors cursor-pointer ${
                     notif.unread 
-                      ? 'bg-[#1a1c23] border border-gray-800/80' 
-                      : 'bg-transparent border border-transparent hover:bg-[#1a1c23]/50'
+                      ? 'bg-[#1a1c23]/60 hover:bg-[#1a1c23]' 
+                      : 'hover:bg-[#1a1c23]/40'
                   }`}
                 >
                   <div className={`w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 ${notif.iconBg}`}>
                     {notif.icon}
                   </div>
-                  <div className="flex-1 min-w-0 pr-8">
-                    <div className="flex justify-between items-start mb-1">
-                      <h3 className="text-white font-bold text-[13px] truncate">{notif.title}</h3>
-                      <span className="text-gray-500 text-[10px] font-semibold whitespace-nowrap">{notif.time}</span>
+                  <div className="flex-1 min-w-0 pr-6">
+                    <div className="mb-0.5">
+                      <h3 className="text-white font-bold text-[13px] leading-tight">
+                        {notif.title}
+                      </h3>
                     </div>
-                    <p className="text-gray-400 text-[12px] leading-relaxed">{notif.desc}</p>
+                    <p className="text-gray-400 text-[12px] leading-snug line-clamp-2">{notif.desc}</p>
+                    <span className="text-[#ff8c37] text-[10px] font-bold mt-1 inline-block">{notif.time}</span>
                   </div>
                   {notif.unread && (
-                    <div className="absolute right-4 top-[50%] -translate-y-1/2 w-2 h-2 rounded-full bg-[#ff8c37]" />
+                    <div className="absolute right-3 top-1/2 -translate-y-1/2 w-2.5 h-2.5 rounded-full bg-[#ff8c37] shadow-[0_0_8px_rgba(255,140,55,0.6)]" />
                   )}
                 </div>
               ))}
             </div>
           </motion.div>
-        </div>
+        </>
       )}
     </AnimatePresence>
   )
-
-  if (typeof document === 'undefined') return null;
-  return createPortal(modalContent, document.body);
 }
