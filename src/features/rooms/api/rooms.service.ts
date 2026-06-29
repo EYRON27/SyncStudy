@@ -38,5 +38,9 @@ export const roomsService = {
   joinRoom: async (data: JoinRoomInput): Promise<Room> => {
     const response = await api.post('/rooms/join', data)
     return response.data.data
+  },
+
+  deleteRoom: async (roomId: string): Promise<void> => {
+    await api.delete(`/rooms/${roomId}`)
   }
 }

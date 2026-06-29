@@ -18,7 +18,7 @@ export default function KanbanColumn({ id, title, tasks, onDeleteTask }: KanbanC
     switch (colId) {
       case 'todo': return 'bg-blue-500 shadow-[0_0_10px_rgba(59,130,246,0.5)]'
       case 'in-progress': return 'bg-yellow-500 shadow-[0_0_10px_rgba(234,179,8,0.5)]'
-      case 'review': return 'bg-purple-500 shadow-[0_0_10px_rgba(168,85,247,0.5)]'
+      case 'overdue': return 'bg-red-500 shadow-[0_0_10px_rgba(239,68,68,0.5)]'
       case 'done': return 'bg-green-500 shadow-[0_0_10px_rgba(34,197,94,0.5)]'
       default: return 'bg-gray-500'
     }
@@ -28,7 +28,7 @@ export default function KanbanColumn({ id, title, tasks, onDeleteTask }: KanbanC
     switch (colId) {
       case 'todo': return 'bg-[#161925] border-blue-500 shadow-[0_0_30px_rgba(59,130,246,0.15)]'
       case 'in-progress': return 'bg-[#1a1814] border-yellow-500 shadow-[0_0_30px_rgba(234,179,8,0.15)]'
-      case 'review': return 'bg-[#191522] border-purple-500 shadow-[0_0_30px_rgba(168,85,247,0.15)]'
+      case 'overdue': return 'bg-[#1c1414] border-red-500 shadow-[0_0_30px_rgba(239,68,68,0.15)]'
       case 'done': return 'bg-[#141c18] border-green-500 shadow-[0_0_30px_rgba(34,197,94,0.15)]'
       default: return 'bg-[#1a1c23] border-[#ff8c37] shadow-[0_0_30px_rgba(255,140,55,0.15)]'
     }

@@ -4,8 +4,10 @@ import TopBar from '@/components/dashboard/TopBar'
 import { Plus, Loader2 } from 'lucide-react'
 import { tasksService } from '@/features/tasks/api/tasks.service'
 import type { Task } from '@/features/tasks/api/tasks.service'
+import { roomsService } from '@/features/rooms/api/rooms.service'
 import AddTaskModal from '@/components/dashboard/AddTaskModal'
 import DeleteTaskModal from '@/components/dashboard/DeleteTaskModal'
+import CompleteTaskModal from '@/components/dashboard/CompleteTaskModal'
 import KanbanColumn from '@/components/dashboard/KanbanColumn'
 import {
   DndContext,
@@ -21,6 +23,7 @@ export default function TasksPage() {
   const [loading, setLoading] = useState(true)
   const [isAddModalOpen, setIsAddModalOpen] = useState(false)
   const [taskToDelete, setTaskToDelete] = useState<string | null>(null)
+  const [taskToComplete, setTaskToComplete] = useState<Task | null>(null)
 
   const fetchTasks = async () => {
     try {
@@ -41,10 +44,17 @@ export default function TasksPage() {
   const sensors = useSensors(
     useSensor(PointerSensor, {
       activationConstraint: {
-        distance: 5, // Require 5px movement before dragging starts
+        distance: 5,
       },
     })
   )
+
+  const isOverdue = (task: Task) => {
+    if (!task.dueDate) return false
+    const due = new Date(task.dueDate)
+    due.setHours(23, 59, 59, 999)
+    return due < new Date() && task.status !== 'done'
+  }
 
   const handleDragEnd = async (event: DragEndEvent) => {
     const { active, over } = event
@@ -58,7 +68,7 @@ export default function TasksPage() {
 
     let newStatus = activeTask.status
 
-    if (['todo', 'in-progress', 'review', 'done'].includes(overId)) {
+    if (['todo', 'in-progress', 'overdue', 'done'].includes(overId)) {
       newStatus = overId
     } else {
       const overTask = tasks.find(t => t.id === overId)
@@ -67,16 +77,21 @@ export default function TasksPage() {
       }
     }
 
+    if (newStatus === 'overdue') return // Can't manually drag into overdue
+
+    if (newStatus === 'done' && newStatus !== activeTask.status) {
+      setTaskToComplete(activeTask)
+      return
+    }
+
     if (newStatus !== activeTask.status) {
-      // Optimistic UI Update
       const previousTasks = [...tasks]
       setTasks(tasks.map(t => t.id === activeId ? { ...t, status: newStatus } : t))
-
       try {
         await tasksService.updateTask(activeId, { status: newStatus })
       } catch (err) {
         console.error('Failed to update task status', err)
-        setTasks(previousTasks) // Revert on failure
+        setTasks(previousTasks)
       }
     }
   }
@@ -95,7 +110,31 @@ export default function TasksPage() {
       await tasksService.deleteTask(taskId)
     } catch (err) {
       console.error('Failed to delete task', err)
-      setTasks(previousTasks) // Revert on fail
+      setTasks(previousTasks)
+    }
+  }
+
+  const confirmCompleteTask = async () => {
+    if (!taskToComplete) return
+    const task = taskToComplete
+    setTaskToComplete(null)
+
+    const previousTasks = [...tasks]
+    // Optimistic update
+    setTasks(prev => prev.map(t => t.id === task.id ? { ...t, status: 'done' } : t))
+    try {
+      await tasksService.updateTask(task.id, { status: 'done' })
+      // Delete the associated room (this also deletes messages via cascade)
+      if (task.roomId) {
+        try {
+          await roomsService.deleteRoom(task.roomId)
+        } catch (roomErr) {
+          console.error('Could not delete room (may not be owner):', roomErr)
+        }
+      }
+    } catch (err) {
+      console.error('Failed to complete task', err)
+      setTasks(previousTasks)
     }
   }
 
@@ -109,17 +148,19 @@ export default function TasksPage() {
   }
 
   const sortedTasks = [...tasks].sort((a, b) => {
-    // Sort by priority (descending)
     const priorityDiff = getPriorityWeight(b.priority) - getPriorityWeight(a.priority)
     if (priorityDiff !== 0) return priorityDiff
-    // If priority is same, sort by creation date (newest first)
     return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
   })
 
+  // Overdue tasks: not done and past due date
+  const overdueTasks = sortedTasks.filter(t => isOverdue(t))
+  const overdueIds = new Set(overdueTasks.map(t => t.id))
+
   const columns = [
-    { id: 'todo', title: 'To Do', items: sortedTasks.filter(t => t.status === 'todo') },
-    { id: 'in-progress', title: 'In Progress', items: sortedTasks.filter(t => t.status === 'in-progress') },
-    { id: 'review', title: 'Review', items: sortedTasks.filter(t => t.status === 'review') },
+    { id: 'todo', title: 'To Do', items: sortedTasks.filter(t => t.status === 'todo' && !overdueIds.has(t.id)) },
+    { id: 'in-progress', title: 'In Progress', items: sortedTasks.filter(t => t.status === 'in-progress' && !overdueIds.has(t.id)) },
+    { id: 'overdue', title: 'Overdue', items: overdueTasks },
     { id: 'done', title: 'Done', items: sortedTasks.filter(t => t.status === 'done') }
   ]
 
@@ -186,6 +227,14 @@ export default function TasksPage() {
         onClose={() => setTaskToDelete(null)}
         onConfirm={confirmDeleteTask}
       />
+
+      <CompleteTaskModal
+        isOpen={!!taskToComplete}
+        onClose={() => setTaskToComplete(null)}
+        onConfirm={confirmCompleteTask}
+        hasRoom={!!taskToComplete?.roomId}
+      />
     </div>
   )
 }
+

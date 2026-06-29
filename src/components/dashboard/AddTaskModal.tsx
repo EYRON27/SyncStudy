@@ -13,8 +13,8 @@ export default function AddTaskModal({ isOpen, onClose, onTaskCreated }: AddTask
   const [course, setCourse] = useState('')
   const [title, setTitle] = useState('')
   const [priority, setPriority] = useState('MEDIUM')
-  const [status, setStatus] = useState('todo')
   const [dueDate, setDueDate] = useState('')
+  const [dueTime, setDueTime] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
 
@@ -24,6 +24,17 @@ export default function AddTaskModal({ isOpen, onClose, onTaskCreated }: AddTask
       setError('Course and Title are required')
       return
     }
+    if (!dueDate) {
+      setError('Due date is required')
+      return
+    }
+
+    let finalDueDate = dueDate;
+    if (dueDate && dueTime) {
+      finalDueDate = `${dueDate}T${dueTime}:00`;
+    } else if (dueDate) {
+      finalDueDate = `${dueDate}T23:59:59`;
+    }
 
     setError('')
     setLoading(true)
@@ -32,16 +43,15 @@ export default function AddTaskModal({ isOpen, onClose, onTaskCreated }: AddTask
         course: course.trim(),
         title: title.trim(),
         priority,
-        status,
-        dueDate: dueDate || undefined
+        dueDate: finalDueDate
       })
       onTaskCreated()
       onClose()
       setCourse('')
       setTitle('')
       setPriority('MEDIUM')
-      setStatus('todo')
       setDueDate('')
+      setDueTime('')
     } catch (err: any) {
       setError(err.response?.data?.message || 'Failed to create task')
     } finally {
@@ -105,44 +115,41 @@ export default function AddTaskModal({ isOpen, onClose, onTaskCreated }: AddTask
                 />
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-gray-300">Priority</label>
-                  <select
-                    value={priority}
-                    onChange={(e) => setPriority(e.target.value)}
-                    className="w-full px-4 py-3 bg-[#16171d] border border-gray-800 rounded-xl text-white focus:outline-none focus:border-[#ff8c37] focus:ring-1 focus:ring-[#ff8c37] transition-all appearance-none"
-                  >
-                    <option value="LOW">Low</option>
-                    <option value="MEDIUM">Medium</option>
-                    <option value="HIGH">High</option>
-                  </select>
-                </div>
-
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-gray-300">Status</label>
-                  <select
-                    value={status}
-                    onChange={(e) => setStatus(e.target.value)}
-                    className="w-full px-4 py-3 bg-[#16171d] border border-gray-800 rounded-xl text-white focus:outline-none focus:border-[#ff8c37] focus:ring-1 focus:ring-[#ff8c37] transition-all appearance-none"
-                  >
-                    <option value="todo">To Do</option>
-                    <option value="in-progress">In Progress</option>
-                    <option value="review">Review</option>
-                    <option value="done">Done</option>
-                  </select>
-                </div>
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-gray-300">Priority</label>
+                <select
+                  value={priority}
+                  onChange={(e) => setPriority(e.target.value)}
+                  className="w-full px-4 py-3 bg-[#16171d] border border-gray-800 rounded-xl text-white focus:outline-none focus:border-[#ff8c37] focus:ring-1 focus:ring-[#ff8c37] transition-all appearance-none"
+                >
+                  <option value="LOW">Low</option>
+                  <option value="MEDIUM">Medium</option>
+                  <option value="HIGH">High</option>
+                </select>
               </div>
 
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-gray-300">Deadline (Optional)</label>
-                <input
-                  type="date"
-                  value={dueDate}
-                  min={new Date().toISOString().split('T')[0]}
-                  onChange={(e) => setDueDate(e.target.value)}
-                  className="w-full px-4 py-3 bg-[#16171d] border border-gray-800 rounded-xl text-white focus:outline-none focus:border-[#ff8c37] focus:ring-1 focus:ring-[#ff8c37] transition-all"
-                />
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-gray-300">Deadline Date <span className="text-red-400">*</span></label>
+                  <input
+                    required
+                    type="date"
+                    value={dueDate}
+                    min={new Date().toISOString().split('T')[0]}
+                    onChange={(e) => setDueDate(e.target.value)}
+                    className="w-full px-4 py-3 bg-[#16171d] border border-gray-800 rounded-xl text-white focus:outline-none focus:border-[#ff8c37] focus:ring-1 focus:ring-[#ff8c37] transition-all"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-gray-300">Deadline Time</label>
+                  <input
+                    type="time"
+                    value={dueTime}
+                    onChange={(e) => setDueTime(e.target.value)}
+                    className="w-full px-4 py-3 bg-[#16171d] border border-gray-800 rounded-xl text-white focus:outline-none focus:border-[#ff8c37] focus:ring-1 focus:ring-[#ff8c37] transition-all appearance-none"
+                  />
+                </div>
               </div>
 
               <button
