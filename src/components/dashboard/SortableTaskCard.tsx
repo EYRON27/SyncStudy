@@ -35,6 +35,8 @@ export default function SortableTaskCard({ task, onDelete }: SortableTaskCardPro
 
   const isOverdue = task.dueDate && new Date(task.dueDate) < new Date()
 
+  const isCompletedLate = task.status === 'done' && task.dueDate && new Date(task.dueDate) < new Date(task.updatedAt)
+
   return (
     <div
       ref={setNodeRef}
@@ -48,6 +50,11 @@ export default function SortableTaskCard({ task, onDelete }: SortableTaskCardPro
           {task.room?.name || 'General'}
         </span>
         <div className="flex items-center gap-2">
+          {isCompletedLate && (
+            <span className="text-[10px] font-bold px-2.5 py-0.5 rounded-full border border-amber-500/20 bg-amber-500/10 text-amber-500 uppercase tracking-widest">
+              DONE LATE
+            </span>
+          )}
           <span className={`text-[10px] font-bold px-2.5 py-0.5 rounded-full border uppercase tracking-widest ${getPriorityColor(task.priority)}`}>
             {task.priority}
           </span>

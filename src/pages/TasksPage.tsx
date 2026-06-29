@@ -51,9 +51,7 @@ export default function TasksPage() {
 
   const isOverdue = (task: Task) => {
     if (!task.dueDate) return false
-    const due = new Date(task.dueDate)
-    due.setHours(23, 59, 59, 999)
-    return due < new Date() && task.status !== 'done'
+    return new Date(task.dueDate) < new Date() && task.status !== 'done'
   }
 
   const handleDragEnd = async (event: DragEndEvent) => {
