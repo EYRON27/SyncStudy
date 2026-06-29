@@ -22,6 +22,7 @@ const CURRENCIES = [
   { symbol: '€', code: 'EUR' },
   { symbol: '£', code: 'GBP' },
   { symbol: '¥', code: 'JPY' },
+  { symbol: '₱', code: 'PHP' },
 ]
 
 export default function ExpensesPage() {
