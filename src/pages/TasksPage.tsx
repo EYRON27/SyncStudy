@@ -5,6 +5,7 @@ import { Plus, Loader2 } from 'lucide-react'
 import { tasksService } from '@/features/tasks/api/tasks.service'
 import type { Task } from '@/features/tasks/api/tasks.service'
 import AddTaskModal from '@/components/dashboard/AddTaskModal'
+import DeleteTaskModal from '@/components/dashboard/DeleteTaskModal'
 import KanbanColumn from '@/components/dashboard/KanbanColumn'
 import {
   DndContext,
@@ -19,6 +20,7 @@ export default function TasksPage() {
   const [tasks, setTasks] = useState<Task[]>([])
   const [loading, setLoading] = useState(true)
   const [isAddModalOpen, setIsAddModalOpen] = useState(false)
+  const [taskToDelete, setTaskToDelete] = useState<string | null>(null)
 
   const fetchTasks = async () => {
     try {
@@ -79,8 +81,14 @@ export default function TasksPage() {
     }
   }
 
-  const handleDeleteTask = async (taskId: string) => {
-    if (!window.confirm('Are you sure you want to delete this task?')) return
+  const handleDeleteTask = (taskId: string) => {
+    setTaskToDelete(taskId)
+  }
+
+  const confirmDeleteTask = async () => {
+    if (!taskToDelete) return
+    const taskId = taskToDelete
+    setTaskToDelete(null)
     const previousTasks = [...tasks]
     try {
       setTasks(prev => prev.filter(t => t.id !== taskId))
@@ -171,6 +179,12 @@ export default function TasksPage() {
         isOpen={isAddModalOpen} 
         onClose={() => setIsAddModalOpen(false)} 
         onTaskCreated={fetchTasks} 
+      />
+
+      <DeleteTaskModal
+        isOpen={!!taskToDelete}
+        onClose={() => setTaskToDelete(null)}
+        onConfirm={confirmDeleteTask}
       />
     </div>
   )
