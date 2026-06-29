@@ -9,7 +9,7 @@ export default function TopBar() {
   const [isLightMode, setIsLightMode] = useState(false)
 
   return (
-    <div className="h-[80px] flex items-center justify-between px-8 border-b border-gray-800/50 bg-[#0f1015] relative z-10">
+    <div className="h-[80px] flex items-center justify-between px-8 border-b border-gray-800/50 bg-[#0f1015] relative z-50">
       {/* Search */}
       <div className="flex-1 max-w-md">
         <div className="relative group">
