@@ -2,19 +2,24 @@ import { useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { LayoutDashboard, CheckSquare, Users, DollarSign, FileText, Settings, LogOut } from 'lucide-react'
 import SettingsModal from './SettingsModal'
+import LogoutModal from './LogoutModal'
 import { useAuthStore } from '@/store/authStore'
 
 export default function Sidebar() {
   const location = useLocation()
   const navigate = useNavigate()
   const [isSettingsOpen, setIsSettingsOpen] = useState(false)
+  const [isLogoutOpen, setIsLogoutOpen] = useState(false)
   const { user, logout } = useAuthStore()
 
   const handleLogout = () => {
-    if (window.confirm("Are you sure you want to log out?")) {
-      logout()
-      navigate('/')
-    }
+    setIsLogoutOpen(true)
+  }
+
+  const confirmLogout = () => {
+    logout()
+    setIsLogoutOpen(false)
+    navigate('/')
   }
 
   const isActive = (path: string) => location.pathname === path
@@ -30,7 +35,7 @@ export default function Sidebar() {
     <div className="w-[260px] flex-shrink-0 bg-[#0a0a0c] border-r border-gray-800/50 flex flex-col h-screen overflow-y-auto relative z-20">
       {/* Logo */}
       <div className="p-6">
-        <Link to="/" className="flex items-center gap-3">
+        <Link to="/dashboard" className="flex items-center gap-3">
           <div className="w-8 h-8 rounded-[10px] bg-gradient-to-br from-[#ff8c37] to-[#e65c00] flex items-center justify-center font-bold text-white text-lg shadow-[0_2px_10px_rgba(255,140,55,0.4)]">
             S
           </div>
@@ -92,7 +97,8 @@ export default function Sidebar() {
           </div>
         </div>
       </div>
-      <SettingsModal isOpen={isSettingsOpen} onClose={() => setIsSettingsOpen(false)} />
+      <SettingsModal isOpen={isSettingsOpen} onClose={() => setIsSettingsOpen(false)} onLogoutClick={handleLogout} />
+      <LogoutModal isOpen={isLogoutOpen} onClose={() => setIsLogoutOpen(false)} onConfirm={confirmLogout} />
     </div>
   )
 }
