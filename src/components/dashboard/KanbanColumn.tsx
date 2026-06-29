@@ -8,9 +8,10 @@ interface KanbanColumnProps {
   id: string
   title: string
   tasks: Task[]
+  onDeleteTask?: (id: string) => void
 }
 
-export default function KanbanColumn({ id, title, tasks }: KanbanColumnProps) {
+export default function KanbanColumn({ id, title, tasks, onDeleteTask }: KanbanColumnProps) {
   const { setNodeRef, isOver } = useDroppable({ id })
 
   const getColumnColor = (colId: string) => {
@@ -55,7 +56,7 @@ export default function KanbanColumn({ id, title, tasks }: KanbanColumnProps) {
       <div ref={setNodeRef} className="space-y-4 overflow-y-auto flex-1 pr-1 custom-scrollbar min-h-[150px]">
         <SortableContext items={tasks.map(t => t.id)} strategy={verticalListSortingStrategy}>
           {tasks.map((task) => (
-            <SortableTaskCard key={task.id} task={task} />
+            <SortableTaskCard key={task.id} task={task} onDelete={onDeleteTask} />
           ))}
         </SortableContext>
       </div>

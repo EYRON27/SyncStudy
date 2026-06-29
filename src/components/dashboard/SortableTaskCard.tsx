@@ -1,13 +1,14 @@
 import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
 import type { Task } from '@/features/tasks/api/tasks.service'
-import { Calendar } from 'lucide-react'
+import { Calendar, Trash2 } from 'lucide-react'
 
 interface SortableTaskCardProps {
   task: Task
+  onDelete?: (id: string) => void
 }
 
-export default function SortableTaskCard({ task }: SortableTaskCardProps) {
+export default function SortableTaskCard({ task, onDelete }: SortableTaskCardProps) {
   const {
     attributes,
     listeners,
@@ -46,9 +47,20 @@ export default function SortableTaskCard({ task }: SortableTaskCardProps) {
         <span className="text-gray-400 text-[11px] font-semibold px-2.5 py-1 bg-[#1e1f26] rounded-md truncate max-w-[150px]">
           {task.room?.name || 'General'}
         </span>
-        <span className={`text-[10px] font-bold px-2.5 py-0.5 rounded-full border uppercase tracking-widest ${getPriorityColor(task.priority)}`}>
-          {task.priority}
-        </span>
+        <div className="flex items-center gap-2">
+          <span className={`text-[10px] font-bold px-2.5 py-0.5 rounded-full border uppercase tracking-widest ${getPriorityColor(task.priority)}`}>
+            {task.priority}
+          </span>
+          <button 
+            onPointerDown={(e) => {
+              e.stopPropagation();
+              onDelete?.(task.id);
+            }}
+            className="text-gray-500 hover:text-red-500 hover:bg-red-500/10 p-1 rounded-md transition-colors opacity-0 group-hover:opacity-100"
+          >
+            <Trash2 className="w-3.5 h-3.5" />
+          </button>
+        </div>
       </div>
       <h3 className="text-white font-semibold text-[15px] mb-6 group-hover:text-[#ff8c37] transition-colors">
         {task.title}

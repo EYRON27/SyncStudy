@@ -79,6 +79,18 @@ export default function TasksPage() {
     }
   }
 
+  const handleDeleteTask = async (taskId: string) => {
+    if (!window.confirm('Are you sure you want to delete this task?')) return
+    const previousTasks = [...tasks]
+    try {
+      setTasks(prev => prev.filter(t => t.id !== taskId))
+      await tasksService.deleteTask(taskId)
+    } catch (err) {
+      console.error('Failed to delete task', err)
+      setTasks(previousTasks) // Revert on fail
+    }
+  }
+
   const getPriorityWeight = (priority: string) => {
     switch (priority.toUpperCase()) {
       case 'HIGH': return 3
@@ -145,6 +157,7 @@ export default function TasksPage() {
                       id={column.id} 
                       title={column.title} 
                       tasks={column.items} 
+                      onDeleteTask={handleDeleteTask}
                     />
                   ))}
                 </div>
