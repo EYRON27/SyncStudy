@@ -1,11 +1,12 @@
 import { useState, useEffect, useMemo } from 'react'
 import Sidebar from '@/components/dashboard/Sidebar'
 import TopBar from '@/components/dashboard/TopBar'
-import { Download, Plus, Filter, DollarSign, Trash2, ChevronDown, TrendingUp, TrendingDown, Wallet } from 'lucide-react'
+import { Download, Plus, DollarSign, Trash2, ChevronDown, TrendingUp, TrendingDown, Wallet } from 'lucide-react'
 import { expensesService } from '@/features/expenses/api/expenses.service'
 import type { Expense } from '@/features/expenses/api/expenses.service'
 import AddExpenseModal from '@/components/dashboard/AddExpenseModal'
 import { format } from 'date-fns'
+import { useUIStore } from '@/store/uiStore'
 
 const CATEGORY_COLORS: Record<string, string> = {
   Housing: '#4a6378',
@@ -29,6 +30,17 @@ export default function ExpensesPage() {
   const [expenses, setExpenses] = useState<Expense[]>([])
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
+  const [filterType, setFilterType] = useState<'all' | 'income' | 'expense'>('all')
+  const { globalSearch } = useUIStore()
+
+  const filteredExpenses = useMemo(() => {
+    return expenses.filter(e => {
+      const s = globalSearch.toLowerCase();
+      const matchesSearch = s ? (e.title.toLowerCase().includes(s) || e.category.toLowerCase().includes(s)) : true;
+      const matchesType = filterType === 'all' ? true : e.type === filterType;
+      return matchesSearch && matchesType;
+    });
+  }, [expenses, globalSearch, filterType])
   
   const [currency, setCurrency] = useState(() => {
     return localStorage.getItem('syncstudy-currency') || '$'
@@ -234,9 +246,15 @@ export default function ExpensesPage() {
                 <div className="bg-[#121317] border border-gray-800/80 rounded-[24px] p-6 flex flex-col flex-1 min-h-0">
                   <div className="flex items-center justify-between mb-6 flex-shrink-0">
                     <h2 className="text-white font-bold text-[18px]">Recent Transactions</h2>
-                    <button className="w-8 h-8 rounded-full bg-[#1a1c23] flex items-center justify-center text-gray-400 hover:text-white transition-colors">
-                      <Filter className="w-4 h-4" />
-                    </button>
+                    <select
+                      value={filterType}
+                      onChange={(e) => setFilterType(e.target.value as any)}
+                      className="bg-[#1a1c23] border border-gray-800 text-gray-400 text-[12px] font-bold rounded-full px-3 py-1.5 focus:outline-none focus:border-[#ff8c37]/50 cursor-pointer hover:text-white hover:bg-gray-800 transition-colors appearance-none text-center"
+                    >
+                      <option value="all">All Types</option>
+                      <option value="income">Income Only</option>
+                      <option value="expense">Expenses Only</option>
+                    </select>
                   </div>
 
                   <div className="flex-1 overflow-y-auto pr-2 custom-scrollbar space-y-2">
@@ -245,7 +263,7 @@ export default function ExpensesPage() {
                         <div className="w-8 h-8 border-2 border-[#ff8c37] border-t-transparent rounded-full animate-spin mb-4" />
                         Loading transactions...
                       </div>
-                    ) : expenses.length === 0 ? (
+                    ) : filteredExpenses.length === 0 ? (
                       <div className="flex flex-col items-center justify-center text-center py-20">
                         <div className="w-20 h-20 bg-[#1a1c23] rounded-3xl flex items-center justify-center mb-4 border border-gray-800/50">
                           <DollarSign className="w-8 h-8 text-gray-600" />
@@ -254,7 +272,7 @@ export default function ExpensesPage() {
                         <p className="text-gray-500 text-sm">You haven't added any income or expenses yet.</p>
                       </div>
                     ) : (
-                      expenses.map((t) => (
+                      filteredExpenses.map((t) => (
                         <div key={t.id} className="flex items-center justify-between p-4 rounded-2xl bg-[#16171d] hover:bg-[#1a1c23] border border-gray-800/50 hover:border-gray-700 transition-all group">
                           <div className="flex items-center gap-4">
                             <div className={`w-12 h-12 rounded-2xl flex items-center justify-center border ${

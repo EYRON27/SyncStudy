@@ -139,6 +139,7 @@ export default function AddTaskModal({ isOpen, onClose, onTaskCreated }: AddTask
                 <input
                   type="date"
                   value={dueDate}
+                  min={new Date().toISOString().split('T')[0]}
                   onChange={(e) => setDueDate(e.target.value)}
                   className="w-full px-4 py-3 bg-[#16171d] border border-gray-800 rounded-xl text-white focus:outline-none focus:border-[#ff8c37] focus:ring-1 focus:ring-[#ff8c37] transition-all"
                 />

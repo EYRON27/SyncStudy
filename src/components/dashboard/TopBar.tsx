@@ -2,11 +2,14 @@ import { useState } from 'react'
 import { Search, Sparkles, Sun, Moon, Bell } from 'lucide-react'
 import AskAIModal from './AskAIModal'
 import NotificationsModal from './NotificationsModal'
+import { useUIStore } from '@/store/uiStore'
 
 export default function TopBar() {
   const [isAIModalOpen, setIsAIModalOpen] = useState(false)
   const [isNotifModalOpen, setIsNotifModalOpen] = useState(false)
   const [isLightMode, setIsLightMode] = useState(false)
+  
+  const { globalSearch, setGlobalSearch } = useUIStore()
 
   return (
     <div className="h-[80px] flex items-center justify-between px-8 border-b border-gray-800/50 bg-[#0f1015] relative z-50">
@@ -16,6 +19,8 @@ export default function TopBar() {
           <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500 group-focus-within:text-[#ff8c37] transition-colors" />
           <input
             type="text"
+            value={globalSearch}
+            onChange={(e) => setGlobalSearch(e.target.value)}
             placeholder="Search commands, notes, or tasks (Cmd+K)"
             className="w-full bg-[#16171d] border border-gray-800 rounded-xl py-2.5 pl-10 pr-12 text-[14px] text-white placeholder-gray-500 focus:outline-none focus:border-[#ff8c37]/50 focus:ring-1 focus:ring-[#ff8c37]/50 transition-all"
           />
